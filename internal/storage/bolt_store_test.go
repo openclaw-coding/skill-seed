@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/openclaw-coding/grow-check/pkg/models"
+	"github.com/openclaw-coding/skill-seed/pkg/models"
 )
 
 func TestNew(t *testing.T) {

@@ -1,10 +1,10 @@
 ---
-name: grow-check-skills
+name: skill-seed-skills
 description: Project-specific coding patterns learned from Git history. Use this skill when working on this project to follow team conventions and best practices that have evolved through the codebase. Essential for maintaining code consistency and avoiding common mistakes.
 version: 1.0.0
 ---
 
-# grow-check Skills for [Project Name]
+# skill-seed Skills for [Project Name]
 
 **Auto-generated knowledge base** from Git history analysis. This skill represents the living coding patterns and conventions of this project, learned from actual commits and code changes.
 
@@ -128,7 +128,7 @@ Testing conventions:
 
 This skill is **living documentation** that evolves with your project:
 
-1. **Initial Learning**: Run `grow-check learn --max=100` to learn from existing history
+1. **Initial Learning**: Run `skill-seed learn --max=100` to learn from existing history
 2. **Continuous Learning**: Each new commit is analyzed and patterns are extracted
 3. **Confidence Building**: Patterns gain confidence as they appear more frequently
 4. **Rule Generation**: High-confidence patterns become enforceable rules
@@ -138,16 +138,16 @@ This skill is **living documentation** that evolves with your project:
 
 ```bash
 # Learn from recent commits
-grow-check learn --since=7d
+skill-seed learn --since=7d
 
 # Re-learn all history
-grow-check learn --force
+skill-seed learn --force
 
 # View learned patterns
-grow-check patterns
+skill-seed patterns
 
 # Generate/update skills
-grow-check generate-skills
+skill-seed generate-skills
 ```
 
 ## Pattern Lifecycle
@@ -177,26 +177,26 @@ When you work with AI on this project:
 
 ### Example 1: Following Naming Patterns
 
-❌ **Without grow-check-skills**:
+❌ **Without skill-seed-skills**:
 ```go
 var user_data string  // Inconsistent with project style
 ```
 
-✅ **With grow-check-skills**:
+✅ **With skill-seed-skills**:
 ```go
 var userData string  // Follows learned camelCase pattern
 ```
 
 ### Example 2: Error Handling
 
-❌ **Without grow-check-skills**:
+❌ **Without skill-seed-skills**:
 ```go
 if err != nil {
     return err  // No context
 }
 ```
 
-✅ **With grow-check-skills**:
+✅ **With skill-seed-skills**:
 ```go
 if err != nil {
     return fmt.Errorf("failed to load config: %w", err)  // Learned pattern
@@ -209,22 +209,22 @@ if err != nil {
 
 ```bash
 # Periodic learning (recommended weekly)
-grow-check learn --since=7d
-grow-check generate-skills
+skill-seed learn --since=7d
+skill-seed generate-skills
 
 # Before major changes
-grow-check learn --max=1000
-grow-check generate-skills
+skill-seed learn --max=1000
+skill-seed generate-skills
 ```
 
 ### Skill Health
 
 ```bash
 # Check skill freshness
-grow-check status
+skill-seed status
 
 # View low-confidence patterns that need more examples
-grow-check patterns --min-confidence=0.5
+skill-seed patterns --min-confidence=0.5
 ```
 
 ## Contributing
@@ -246,9 +246,9 @@ Every commit contributes to this skill's knowledge:
 - **Project**: {{PROJECT_NAME}}
 - **Git history**: {{GIT_REMOTE}}
 - **Last learn**: {{LAST_LEARN_TIME}}
-- **Config**: `.skills/grow-check/config.yaml`
+- **Config**: `.skills/skill-seed/config.yaml`
 
 ---
 
-**This skill is automatically generated and maintained by grow-check**
-**Learn more**: [github.com/openclaw-coding/grow-check](https://github.com/openclaw-coding/grow-check)
+**This skill is automatically generated and maintained by skill-seed**
+**Learn more**: [github.com/openclaw-coding/skill-seed](https://github.com/openclaw-coding/skill-seed)

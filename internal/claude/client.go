@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/openclaw-coding/grow-check/pkg/models"
+	"github.com/openclaw-coding/skill-seed/pkg/models"
 )
 
 // Client Claude 客户端

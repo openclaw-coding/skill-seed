@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/openclaw-coding/grow-check/internal/claude"
-	"github.com/openclaw-coding/grow-check/internal/config"
-	"github.com/openclaw-coding/grow-check/internal/git"
-	"github.com/openclaw-coding/grow-check/internal/i18n"
-	"github.com/openclaw-coding/grow-check/internal/storage"
-	"github.com/openclaw-coding/grow-check/pkg/models"
+	"github.com/openclaw-coding/skill-seed/internal/claude"
+	"github.com/openclaw-coding/skill-seed/internal/config"
+	"github.com/openclaw-coding/skill-seed/internal/git"
+	"github.com/openclaw-coding/skill-seed/internal/i18n"
+	"github.com/openclaw-coding/skill-seed/internal/storage"
+	"github.com/openclaw-coding/skill-seed/pkg/models"
 )
 
 // Learner 学习器
@@ -39,7 +39,7 @@ func New(skillPath string) (*Learner, error) {
 	}
 
 	// 创建 Git 操作器
-	projectRoot := filepath.Dir(filepath.Dir(filepath.Dir(skillPath)))
+	projectRoot := filepath.Dir(filepath.Dir(skillPath))
 	gitOp := git.NewGitOperator(projectRoot)
 
 	// 创建 Claude 客户端
@@ -82,18 +82,12 @@ func (l *Learner) LearnFromHistory(sinceDays int, maxCommits int, force bool) er
 	}
 
 	if len(commits) == 0 {
-		fmt.Println(i18n.Get("learn_no_commits"))
-		if !lastLearn.IsZero() {
-			fmt.Printf(i18n.Get("learn_last_learn_time")+"\n", lastLearn.Format("2006-01-02 15:04:05"))
-		}
-		if !since.IsZero() {
-			fmt.Printf(i18n.Get("learn_since_time")+"\n", since.Format("2006-01-02 15:04:05"))
-		}
-		fmt.Println(i18n.Get("learn_tip_force"))
+		l.printNoCommitsMessage(sinceDays, maxCommits, force, lastLearn, since)
 		return nil
 	}
 
-	fmt.Printf(i18n.Get("learn_analyzing_commits")+"\n", len(commits))
+	// Print appropriate message based on parameters
+	l.printLearningStartMessage(len(commits), sinceDays, maxCommits, force)
 
 	// Load existing patterns
 	existingPatterns, err := l.store.GetAllPatterns()
@@ -265,4 +259,49 @@ func (l *Learner) ListRules() error {
 // Close close learner
 func (l *Learner) Close() error {
 	return l.store.Close()
+}
+
+// printLearningStartMessage prints appropriate message based on parameters
+func (l *Learner) printLearningStartMessage(commitCount int, sinceDays int, maxCommits int, force bool) {
+	if force {
+		if maxCommits > 0 && sinceDays == 0 {
+			fmt.Printf(i18n.Get("learn_msg_force_max")+"\n", maxCommits)
+		} else if sinceDays > 0 {
+			fmt.Printf(i18n.Get("learn_msg_force_days")+"\n", sinceDays)
+		} else {
+			fmt.Println(i18n.Get("learn_msg_force_all"))
+		}
+	} else if maxCommits > 0 && sinceDays == 0 {
+		fmt.Printf(i18n.Get("learn_msg_recent_max")+"\n", maxCommits)
+	} else if sinceDays > 0 {
+		fmt.Printf(i18n.Get("learn_msg_recent_days")+"\n", sinceDays)
+	} else {
+		fmt.Printf(i18n.Get("learn_analyzing_commits")+"\n", commitCount)
+	}
+	fmt.Println("")
+}
+
+// printNoCommitsMessage prints appropriate message when no commits found
+func (l *Learner) printNoCommitsMessage(sinceDays int, maxCommits int, force bool, lastLearn time.Time, since time.Time) {
+	fmt.Println(i18n.Get("learn_no_commits"))
+
+	if force {
+		fmt.Println(i18n.Get("learn_no_commits_force_hint"))
+	} else if sinceDays > 0 {
+		fmt.Printf(i18n.Get("learn_no_commits_days_hint")+"\n", sinceDays)
+	} else if maxCommits > 0 {
+		fmt.Printf(i18n.Get("learn_no_commits_max_hint")+"\n", maxCommits)
+	}
+
+	if !lastLearn.IsZero() {
+		fmt.Printf(i18n.Get("learn_last_learn_time")+"\n", lastLearn.Format("2006-01-02 15:04:05"))
+	}
+	if !since.IsZero() {
+		fmt.Printf(i18n.Get("learn_since_time")+"\n", since.Format("2006-01-02 15:04:05"))
+	}
+
+	if !force {
+		fmt.Println("")
+		fmt.Println(i18n.Get("learn_tip_force"))
+	}
 }

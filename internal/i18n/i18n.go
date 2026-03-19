@@ -8,28 +8,36 @@ import "fmt"
 // Messages contains all internationalized messages (Chinese - Default)
 var Messages = map[string]string{
 	// ========== 初始化相关 ==========
-	"init_short": "初始化 grow-check 项目",
-	"init_long": "在当前项目中初始化 grow-check。\n\n此命令将：\n  • 创建 .skills/grow-check/ 目录\n  • 生成默认配置\n  • 安装 Git pre-commit 钩子\n  • 初始化内存数据库\n\n请在 Git 仓库根目录运行此命令。",
+	"init_short": "初始化 skill-seed 项目",
+	"init_long": "在当前项目中初始化 skill-seed。\n\n此命令将：\n  • 创建 .seed/skill-seed/ 目录\n  • 生成默认配置\n  • 安装 Git pre-commit 钩子\n  • 初始化内存数据库\n\n请在 Git 仓库根目录运行此命令。",
 
 	"init_creating_dirs":       "  [创建目录结构]",
 	"init_generating_config":   "  [生成配置文件]",
 	"init_initializing_db":     "  [初始化内存数据库]",
-	"init_installing_hook":     "  [安装 Git pre-commit 钩子]",
-	"init_creating_hook_script": "  [创建钩子脚本]",
-	"init_creating_readme":     "  [创建说明文档]",
-	"init_success":             "grow-check 初始化成功",
-	"init_already_initialized": "grow-check 已经在此目录中初始化过",
+	"init_creating_skill":      "  [创建 SKILL.md]",
+	"init_creating_patterns":   "  [创建模式分类]",
+	"init_success":             "skill-seed 初始化成功",
+	"init_already_initialized": "skill-seed 已经在此目录中初始化过",
 
 	"init_skill_location": "Skill 位置: %s",
 	"init_next_steps":     "后续步骤:",
-	"init_step_learn":     "  1. 从历史学习: grow-check learn --since=30d",
+	"init_step_learn":     "  1. 从历史学习: skill-seed learn --since=30d",
 	"init_step_watch":     "  2. 正常提交并观察它学习",
-	"init_step_patterns":  "  3. 查看学到的模式: grow-check patterns",
-	"init_step_rules":     "  4. 查看生成的规则: grow-check rules",
+	"init_step_patterns":  "  3. 查看学到的模式: skill-seed patterns",
+	"init_step_rules":     "  4. 查看生成的规则: skill-seed rules",
 
 	// ========== 学习相关 ==========
-	"learn_from_history": "从 Git 历史学习中 (最近 %d 天)...",
-	"learn_failed":       "学习失败: %v",
+	"learn_from_history":        "从 Git 历史学习中",
+	"learn_failed":              "学习失败: %v",
+	"learn_msg_recent_days":     "正在分析最近 %d 天的提交...",
+	"learn_msg_recent_max":      "正在分析最近 %d 个提交...",
+	"learn_msg_force_max":       "强制重新学习最近 %d 个提交...",
+	"learn_msg_force_days":      "强制重新学习最近 %d 天的提交...",
+	"learn_msg_force_all":       "强制重新学习所有提交...",
+	"learn_no_commits":          "没有新的提交需要学习",
+	"learn_no_commits_force_hint": "所有提交都已学习完成",
+	"learn_no_commits_days_hint": "最近 %d 天内没有新的提交",
+	"learn_no_commits_max_hint":  "最近 %d 个提交都已学习过",
 
 	// ========== 检查相关 ==========
 	"check_checking_files":   "正在检查 %d 个文件...",
@@ -52,18 +60,18 @@ var Messages = map[string]string{
 	"check_invalid_choice":    "无效的选择",
 
 	// ========== 错误提示 ==========
-	"check_init_failed":    "grow-check 未初始化",
+	"check_init_failed":    "skill-seed 未初始化",
 	"check_init_hint":      "提示: 请先在项目根目录运行以下命令进行初始化:",
-	"check_init_command":   "   grow-check init",
-	"check_init_more_info": "更多信息: https://github.com/openclaw-coding/grow-check",
+	"check_init_command":   "   skill-seed init",
+	"check_init_more_info": "更多信息: https://github.com/openclaw-coding/skill-seed",
 
 	"init_failed":  "初始化失败: %v",
 	"check_failed": "检查失败: %v",
 	"check_error":   "错误: %v",
 
 	// ========== 命令描述 ==========
-	"cmd_init_short":     "初始化 grow-check",
-	"cmd_init_long":      "在当前项目中初始化 grow-check 作为项目级 skill",
+	"cmd_init_short":     "初始化 skill-seed",
+	"cmd_init_long":      "在当前项目中初始化 skill-seed 作为项目级 skill",
 	"cmd_learn_short":    "从 Git 历史学习",
 	"cmd_learn_long":     "分析 Git 提交历史并学习编码模式",
 	"cmd_check_short":    "手动运行 pre-commit 检查",
@@ -74,6 +82,14 @@ var Messages = map[string]string{
 	"cmd_view_long":      "查看学习到的模式和生成的规则",
 	"cmd_generate_short": "生成 Claude Code skills",
 	"cmd_generate_long":  "从学习到的模式生成 Claude Code skills",
+	"cmd_hook_short":     "管理 Git hooks",
+	"cmd_hook_long":      "安装或卸载 Git pre-commit hook",
+	"cmd_hook_install_short": "安装 Git pre-commit hook",
+	"cmd_hook_install_long": "在 .git/hooks/ 中安装 pre-commit hook，每次提交前自动运行检查",
+	"cmd_hook_uninstall_short": "卸载 Git pre-commit hook",
+	"cmd_hook_uninstall_long": "从 .git/hooks/ 中移除 pre-commit hook",
+	"cmd_scan_short":            "扫描并分析当前项目",
+	"cmd_scan_long":             "分析当前项目状态并学习代码模式",
 
 	// ========== 其他消息 ==========
 	"msg_analyzing":  "正在分析...",
@@ -86,13 +102,9 @@ var Messages = map[string]string{
 	"msg_info":       "信息",
 
 	// ========== 初始化命令详情 ==========
-	"init_start":                   "初始化 grow-check",
-	"init_hook_install_failed":     "  钩子安装失败: %v",
-	"init_hook_install_manual":     "  可以稍后手动安装",
-	"init_hook_installed":          "  钩子已安装",
+	"init_start": "初始化 skill-seed",
 
 	// ========== 学习命令详情 ==========
-	"learn_no_commits":           "没有新的提交需要学习",
 	"learn_last_learn_time":      "   上次学习时间: %s",
 	"learn_since_time":           "   起始时间: %s",
 	"learn_tip_force":            "提示: 使用 --force 参数重新学习所有提交",
@@ -134,12 +146,29 @@ var Messages = map[string]string{
 	"generate_success":           "Skills 生成成功",
 	"generate_next_steps":        "后续步骤:",
 	"generate_step1":             "  1. 查看生成的 skills: %s",
-	"generate_step2":             "  2. 在 Claude Code 中测试: /grow-check-skills",
+	"generate_step2":             "  2. 在 Claude Code 中测试: /skill-seed-skills",
 	"generate_step3":             "  3. 提交到版本控制（可选）",
 	"generate_output_location":   "已生成到: %s",
 	"generate_patterns_count":    "学到的模式数: %d",
 	"generate_avg_confidence":    "平均置信度: %.1f%%",
 	"generate_file_created":      "  已生成: %s",
+
+	// ========== Hook 命令详情 ==========
+	"hook_installing":            "正在安装 Git pre-commit hook...",
+	"hook_install_failed":        "  Hook 安装失败: %v",
+	"hook_installed":             "Hook 已安装",
+	"hook_installed_success":     "每次提交前将自动运行 skill-seed check",
+	"hook_uninstalling":          "正在卸载 Git pre-commit hook...",
+	"hook_uninstall_failed":      "  Hook 卸载失败: %v",
+	"hook_uninstalled":           "Hook 已卸载",
+
+	// ========== Scan 命令详情 ==========
+	"scan_analyzing_project":     "正在分析当前项目...",
+	"scan_project_root":         "  项目根目录: %s",
+	"scan_no_files":             "未找到可分析的文件",
+	"scan_found_files":          "找到 %d 个文件",
+	"scan_marked_learned":       "已标记当前提交为已学习: %s",
+	"scan_completed":            "项目扫描完成",
 }
 
 // Get returns the message for the given key

@@ -1,6 +1,6 @@
-# grow-check Skills Template
+# skill-seed Skills Template
 
-这是一个能够**持续成长**的 Claude Code Skills 模板，通过 grow-check 工具从 Git 历史学习项目编码模式后自动生成。
+这是一个能够**持续成长**的 Claude Code Skills 模板，通过 skill-seed 工具从 Git 历史学习项目编码模式后自动生成。
 
 ## 🎯 核心理念
 
@@ -14,7 +14,7 @@
 ## 📁 目录结构
 
 ```
-.template/skills/grow-check-skills/
+.template/skills/skill-seed-skills/
 ├── SKILL.md                                    # 主入口文件
 └── references/                                 # 详细模式文档
     ├── naming-patterns.md                      # 命名规范
@@ -30,26 +30,26 @@
 
 ```bash
 # 在你的项目中
-grow-check init
+skill-seed init
 
 # 学习现有代码历史
-grow-check learn --max=100
+skill-seed learn --max=100
 
 # 生成初始 skills
-grow-check generate-skills
+skill-seed generate-skills
 ```
 
 ### 2. 持续成长
 
 ```bash
 # 每周学习新模式
-grow-check learn --since=7d
+skill-seed learn --since=7d
 
 # 更新 skills
-grow-check generate-skills
+skill-seed generate-skills
 
 # 查看 learning 进度
-grow-check status
+skill-seed status
 ```
 
 ### 3. AI 使用
@@ -63,14 +63,14 @@ grow-check status
 
 ## 📝 模板变量说明
 
-所有模板文件使用 `{{VARIABLE_NAME}}` 格式的占位符，由 grow-check 填充：
+所有模板文件使用 `{{VARIABLE_NAME}}` 格式的占位符，由 skill-seed 填充：
 
 ### 全局变量
 
 - `{{TIMESTAMP}}` - 生成时间
 - `{{PROJECT_NAME}}` - 项目名称
 - `{{GIT_REMOTE}}` - Git 仓库地址
-- `{{VERSION}}` - grow-check 版本
+- `{{VERSION}}` - skill-seed 版本
 - `{{COMMITS_ANALYZED}}` - 分析的提交数
 
 ### 统计变量
@@ -155,20 +155,20 @@ grow-check status
 
 ## 🔧 生成器实现
 
-`grow-check generate-skills` 命令应该：
+`skill-seed generate-skills` 命令应该：
 
-1. **读取模板**：加载 `.template/skills/grow-check-skills/` 中的模板文件
+1. **读取模板**：加载 `.template/skills/skill-seed-skills/` 中的模板文件
 2. **获取模式**：从 BoltDB 读取学习到的模式
 3. **分析统计**：计算各种统计指标
 4. **填充变量**：替换模板中的占位符
-5. **输出结果**：生成到 `~/.claude/skills/grow-check-skills/`
+5. **输出结果**：生成到 `~/.claude/skills/skill-seed-skills/`
 
 ### 伪代码
 
 ```go
 func GenerateSkills(skillPath string) error {
     // 1. 加载模板
-    templates := loadTemplates(".template/skills/grow-check-skills/")
+    templates := loadTemplates(".template/skills/skill-seed-skills/")
 
     // 2. 获取学习数据
     patterns := getAllPatterns()
@@ -192,14 +192,14 @@ func GenerateSkills(skillPath string) error {
 
 ### 示例 1：AI 遵循命名模式
 
-**没有 grow-check-skills**：
+**没有 skill-seed-skills**：
 ```go
 // AI 可能生成
 var user_data string
 func Get_User_Info() {}
 ```
 
-**有 grow-check-skills**：
+**有 skill-seed-skills**：
 ```go
 // AI 会遵循学习到的模式
 var userData string
@@ -208,14 +208,14 @@ func getUserInfo() {}
 
 ### 示例 2：AI 遵循错误处理模式
 
-**没有 grow-check-skills**：
+**没有 skill-seed-skills**：
 ```go
 if err != nil {
     return err
 }
 ```
 
-**有 grow-check-skills**：
+**有 skill-seed-skills**：
 ```go
 if err != nil {
     return fmt.Errorf("failed to load config: %w", err)
@@ -224,7 +224,7 @@ if err != nil {
 
 ## 🎯 与 jzero-skills 的对比
 
-| 特性 | jzero-skills | grow-check-skills |
+| 特性 | jzero-skills | skill-seed-skills |
 |------|--------------|-------------------|
 | 内容来源 | 框架规范文档 | 项目实际代码 |
 | 更新方式 | 手动维护 | 自动学习 |
@@ -234,7 +234,7 @@ if err != nil {
 
 两者是**互补**的：
 - `jzero-skills` 提供框架层面的通用规范
-- `grow-check-skills` 提供项目层面的特定模式
+- `skill-seed-skills` 提供项目层面的特定模式
 
 ## 🚀 下一步
 
@@ -256,4 +256,4 @@ MIT License - 详见 [LICENSE](../../LICENSE)
 
 ---
 
-**Made with ❤️ by the grow-check team**
+**Made with ❤️ by the skill-seed team**

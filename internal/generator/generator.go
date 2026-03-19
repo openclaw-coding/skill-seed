@@ -9,9 +9,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/openclaw-coding/grow-check/internal/i18n"
-	"github.com/openclaw-coding/grow-check/internal/storage"
-	"github.com/openclaw-coding/grow-check/pkg/models"
+	"github.com/openclaw-coding/skill-seed/internal/i18n"
+	"github.com/openclaw-coding/skill-seed/internal/storage"
+	"github.com/openclaw-coding/skill-seed/pkg/models"
 )
 
 // Generator skills 生成器
@@ -50,7 +50,7 @@ func (g *Generator) Generate(outputPath string) error {
 	vars := g.prepareTemplateVars(patterns, stats)
 
 	// 4. 加载模板目录
-	templateDir := filepath.Join(g.projectRoot, ".template", "skills", "grow-check-skills")
+	templateDir := filepath.Join(g.projectRoot, ".template", "skills", "skill-seed-skills")
 
 	// 5. 生成所有文件
 	if err := g.generateFiles(templateDir, outputPath, vars); err != nil {

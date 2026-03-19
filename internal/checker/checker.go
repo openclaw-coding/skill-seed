@@ -7,13 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/openclaw-coding/grow-check/internal/claude"
-	"github.com/openclaw-coding/grow-check/internal/config"
-	"github.com/openclaw-coding/grow-check/internal/git"
-	"github.com/openclaw-coding/grow-check/internal/i18n"
-	"github.com/openclaw-coding/grow-check/internal/output"
-	"github.com/openclaw-coding/grow-check/internal/storage"
-	"github.com/openclaw-coding/grow-check/pkg/models"
+	"github.com/openclaw-coding/skill-seed/internal/claude"
+	"github.com/openclaw-coding/skill-seed/internal/config"
+	"github.com/openclaw-coding/skill-seed/internal/git"
+	"github.com/openclaw-coding/skill-seed/internal/i18n"
+	"github.com/openclaw-coding/skill-seed/internal/output"
+	"github.com/openclaw-coding/skill-seed/internal/storage"
+	"github.com/openclaw-coding/skill-seed/pkg/models"
 )
 
 // Checker code checker

@@ -1,19 +1,19 @@
 # Build Instructions
 
-This document explains how to build grow-check with different language settings.
+This document explains how to build skill-seed with different language settings.
 
 ## Build English Version (Default)
 
 To build the English version (default):
 
 ```bash
-go build -o grow-check ./cmd/grow-check
+go build -o skill-seed ./cmd/skill-seed
 ```
 
 Or explicitly without language tags:
 
 ```bash
-go build -tags="" -o grow-check ./cmd/grow-check
+go build -tags="" -o skill-seed ./cmd/skill-seed
 ```
 
 ## Build Chinese Version
@@ -21,7 +21,7 @@ go build -tags="" -o grow-check ./cmd/grow-check
 To build the Chinese version:
 
 ```bash
-go build -tags cn -o grow-check-cn ./cmd/grow-check
+go build -tags cn -o skill-seed-cn ./cmd/skill-seed
 ```
 
 ## Installation
@@ -30,20 +30,20 @@ After building, you can install the binary to your system:
 
 ```bash
 # For English version
-mv grow-check /usr/local/bin/
+mv skill-seed /usr/local/bin/
 
 # For Chinese version
-mv grow-check-cn /usr/local/bin/grow-check
+mv skill-seed-cn /usr/local/bin/skill-seed
 ```
 
 Or use `go install`:
 
 ```bash
 # English version
-go install ./cmd/grow-check
+go install ./cmd/skill-seed
 
 # Chinese version
-go install -tags cn ./cmd/grow-check
+go install -tags cn ./cmd/skill-seed
 ```
 
 ## Development
@@ -52,10 +52,10 @@ When developing, you can test both language versions:
 
 ```bash
 # Test English
-go run ./cmd/grow-check check
+go run ./cmd/skill-seed check
 
 # Test Chinese
-go run -tags cn ./cmd/grow-check check
+go run -tags cn ./cmd/skill-seed check
 ```
 
 ## Language Files
@@ -74,4 +74,4 @@ To add a new language:
    // +build es
    ```
 3. Copy the message map and translate all values
-4. Build with: `go build -tags es ./cmd/grow-check`
+4. Build with: `go build -tags es ./cmd/skill-seed`

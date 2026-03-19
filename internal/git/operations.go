@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/openclaw-coding/grow-check/pkg/models"
+	"github.com/openclaw-coding/skill-seed/pkg/models"
 )
 
 // GitOperator Git 操作器
@@ -180,7 +180,7 @@ func (g *GitOperator) InstallPreCommitHook(skillPath string) error {
 		}
 
 		// If it already contains our hook, skip
-		if strings.Contains(string(content), "grow-check") {
+		if strings.Contains(string(content), "skill-seed") {
 			return nil
 		}
 
@@ -191,8 +191,8 @@ func (g *GitOperator) InstallPreCommitHook(skillPath string) error {
 # Original hook content:
 %s
 
-# grow-check hook
-grow-check check || exit $?
+# skill-seed hook
+skill-seed check || exit $?
 `, string(content))
 
 		if err := os.WriteFile(hookPath, []byte(newContent), 0755); err != nil {
@@ -203,12 +203,75 @@ grow-check check || exit $?
 
 	// Create new hook script
 	content := `#!/bin/sh
-# grow-check pre-commit hook
-grow-check check || exit $?
+# skill-seed pre-commit hook
+skill-seed check || exit $?
 `
 
 	if err := os.WriteFile(hookPath, []byte(content), 0755); err != nil {
 		return fmt.Errorf("failed to create hook: %w", err)
+	}
+
+	return nil
+}
+
+// UninstallPreCommitHook uninstalls pre-commit hook
+func (g *GitOperator) UninstallPreCommitHook() error {
+	hookPath := filepath.Join(g.repoPath, ".git", "hooks", "pre-commit")
+
+	// Check if hook exists
+	if _, err := os.Stat(hookPath); os.IsNotExist(err) {
+		return fmt.Errorf("hook not installed")
+	}
+
+	// Read existing content
+	content, err := os.ReadFile(hookPath)
+	if err != nil {
+		return fmt.Errorf("failed to read hook: %w", err)
+	}
+
+	contentStr := string(content)
+
+	// If hook doesn't contain skill-seed, nothing to do
+	if !strings.Contains(contentStr, "skill-seed") {
+		return fmt.Errorf("skill-seed hook not found")
+	}
+
+	// If hook is only skill-seed, remove it
+	if strings.TrimSpace(contentStr) == "#!/bin/sh\n# skill-seed pre-commit hook\nskill-seed check || exit $?" {
+		if err := os.Remove(hookPath); err != nil {
+			return fmt.Errorf("failed to remove hook: %w", err)
+		}
+		return nil
+	}
+
+	// If hook is chained, remove our part
+	lines := strings.Split(contentStr, "\n")
+	newLines := []string{}
+	skipOurSection := false
+
+	for _, line := range lines {
+		if strings.Contains(line, "skill-seed hook") {
+			skipOurSection = true
+			continue
+		}
+		if skipOurSection && strings.Contains(line, "Original hook content:") {
+			skipOurSection = false
+			continue
+		}
+		if !skipOurSection && !strings.HasPrefix(line, "skill-seed check") {
+			newLines = append(newLines, line)
+		}
+	}
+
+	if len(newLines) > 0 {
+		newContent := strings.Join(newLines, "\n")
+		if err := os.WriteFile(hookPath, []byte(newContent), 0755); err != nil {
+			return fmt.Errorf("failed to update hook: %w", err)
+		}
+	} else {
+		if err := os.Remove(hookPath); err != nil {
+			return fmt.Errorf("failed to remove hook: %w", err)
+		}
 	}
 
 	return nil
@@ -231,4 +294,15 @@ func (g *GitOperator) GetProjectName() string {
 	}
 
 	return filepath.Base(g.repoPath)
+}
+
+// GetCurrentCommitHash 获取当前提交的哈希值
+func (g *GitOperator) GetCurrentCommitHash() (string, error) {
+	cmd := exec.Command("git", "rev-parse", "HEAD")
+	cmd.Dir = g.repoPath
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("failed to get current commit: %w", err)
+	}
+	return strings.TrimSpace(string(output)), nil
 }

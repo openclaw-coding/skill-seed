@@ -1,325 +1,232 @@
-# grow-check 🌱
+# Skill-Seed
 
-> **成长型 Git 预提交检查器** - 越用越懂你的项目
+> 🌱 让项目 Skills 持续成长 - 为 AI Agents 学习项目编码模式的智能工具
 
-[![Go Version](https://img.shields.io/badge/Go-1.21%2B-00ADD8?style=flat&logo=go)](https://golang.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Go Version](https://img.shields.io/badge/go-1.25%2B-brightgreen.svg)](https://go.dev/)
 
-## 🎯 特性
+## 什么是 Skill-Seed？
 
-- ✅ **项目级 Skill** - 作为项目的一部分，不污染全局配置
-- 🤖 **Claude 集成** - 利用本地 Claude 进行深度代码分析
-- 📚 **增量学习** - 从 Git 历史中学习团队的编码模式
-- 🔧 **自动修复** - 支持交互式确认和自动修复
-- 🚀 **高性能** - BoltDB 本地存储，毫秒级响应
+Skill-Seed 是一个**项目级技能成长工具**，它从 Git 历史中学习你的团队编码模式，自动生成和更新 Claude Code（及其他 AI Agents）的 Skills，帮助 AI 更好地理解你的项目。
 
-## 📦 安装
+### 核心特性
 
-### 从源码编译
+- 🌱 **持续成长**: 从 Git 提交历史中学习编码模式，越来越聪明
+- 🤖 **AI 深度分析**: 集成 Claude 进行深度代码分析
+- 📊 **模式提取**: 自动识别命名、错误处理、架构等模式
+- 🔄 **增量学习**: 只学习新的提交，不重复工作
+- 🎯 **多 AI 支持**: 生成的 Skills 可被 Claude Code、Cursor 等 AI 工具使用
+- 🌍 **国际化**: 完整的中英文支持
 
-```bash
-# 克隆仓库
-git clone https://github.com/openclaw-coding/grow-check.git
-cd grow-check
+## 快速开始
 
-# 编译
-make build
-
-# 安装到系统（可选）
-sudo make install
-```
-
-### 下载预编译版本
+### 安装
 
 ```bash
-# macOS/Linux
-curl -sL https://github.com/openclaw-coding/grow-check/releases/latest/download/grow-check-$(uname -s)-$(uname -m) -o grow-check
-chmod +x grow-check
-sudo mv grow-check /usr/local/bin/
+go install github.com/openclaw-coding/skill-seed@latest
 ```
 
-## 🚀 快速开始
+### 初始化
 
-### 1. 初始化
-
-在你的 Git 项目根目录下运行：
+在你的 Git 项目根目录运行：
 
 ```bash
-cd your-project
-grow-check init
+skill-seed init
 ```
 
-输出：
+这会创建：
 ```
-📦 Initializing grow-check...
-  Creating directory structure...
-  Generating configuration...
-  Initializing memory database...
-  Installing Git pre-commit hook...
-  Creating hook script...
-  Creating README...
-
-✅ grow-check initialized successfully!
-
-📁 Skill location: /path/to/your-project/.skills/grow-check
-
-Next steps:
-  1. Learn from history: grow-check learn --since=30d
-  2. Make commits and watch it learn!
-  3. View patterns: grow-check patterns
-  4. View rules: grow-check rules
+.seed/skill-seed/
+├── SKILL.md              # 主技能文件
+├── config.yaml           # 配置
+├── memory/               # 学习数据库
+└── references/           # 模式分类
+    ├── naming-patterns/
+    ├── error-handling-patterns/
+    └── ...
 ```
 
-### 2. 首次学习
+### 学习模式
 
-从 Git 历史中学习团队的编码模式：
+#### 1. 从 Git 历史学习
 
 ```bash
 # 学习最近 30 天的提交
-grow-check learn --since=30d
-
-# 或学习最近 100 个提交
-grow-check learn --max=100
-```
-
-输出：
-```
-🤖 Learning from Git history (last 30 days)...
-
-📚 Analyzing 150 commits...
-  [1/150] Analyzing a1b2c3d4...
-  [2/150] Analyzing e5f6g7h8...
-  ...
-  🤖 Analyzing with Claude...
-
-✨ Learned 12 new patterns
-
-📏 Generating rules from patterns...
-✅ Created 5 new rules
-```
-
-### 3. 正常使用
-
-现在，每次 `git commit` 时，grow-check 会自动运行：
-
-```bash
-git add .
-git commit -m "Add new feature"
-```
-
-输出：
-```
-🔍 Checking 3 files...
-🤖 Analyzing with Claude...
-
-⚠ Found 2 issues:
-
-1. ⚠ auth/login.go:42
-   错误处理未包含日志记录
-   💡 建议: 在错误处理中添加 log.Printf
-
-2. ℹ database/connection.go:15
-   数据库连接缺少超时设置
-   💡 建议: 添加 context.WithTimeout
-
-Options:
-1. Auto-fix (recommended)
-2. View details
-3. Ignore (with reason)
-4. Abort commit
-
-Your choice [1-4]: 
-```
-
-## 📖 CLI 命令
-
-### `grow-check init`
-
-初始化项目级 Skill。
-
-```bash
-grow-check init
-```
-
-### `grow-check learn`
-
-从 Git 历史学习。
-
-```bash
-# 学习最近 30 天
-grow-check learn
-
-# 学习最近 7 天
-grow-check learn --since=7
+skill-seed learn
 
 # 学习最近 100 个提交
-grow-check learn --max=100
+skill-seed learn --max=100
+
+# 学习最近 7 天的提交
+skill-seed learn --since=7
+
+# 强制重新学习
+skill-seed learn --force
 ```
 
-### `grow-check check`
-
-手动运行检查（等同于 pre-commit 钩子）。
+#### 2. 扫描当前项目
 
 ```bash
-grow-check check
+# 扫描当前项目状态
+skill-seed scan
 ```
 
-### `grow-check patterns`
-
-查看学习到的模式。
+#### 3. 分析特定文件
 
 ```bash
-grow-check patterns
+skill-seed analyze main.go
+skill-seed analyze src/
 ```
 
-输出示例：
-```
-📋 Learned patterns (12 total):
-
-1. [error_handling] 错误处理必须包含日志
-   Confidence: 0.95 | Frequency: 23 | Auto-fixable: true
-   Example: if err != nil { log.Printf("...") }
-
-2. [naming] 接口命名使用 -er 后缀
-   Confidence: 0.87 | Frequency: 15 | Auto-fixable: false
-   Example: type Reader interface { ... }
-```
-
-### `grow-check rules`
-
-查看生成的规则。
+### 生成 Skills
 
 ```bash
-grow-check rules
+# 生成 Claude Code Skills
+skill-seed generate-skills
 ```
 
-## ⚙️ 配置
+生成的 Skills 会被输出到 `~/.claude/skills/skill-seed-skills/`，Claude Code 会自动发现。
 
-配置文件位于 `.skills/grow-check/config.yaml`：
+### 查看
+
+```bash
+# 查看学到的模式
+skill-seed view patterns
+
+# 查看生成的规则
+skill-seed view rules
+```
+
+### Git Hooks
+
+可选：安装 Git pre-commit hook，每次提交前自动运行检查：
+
+```bash
+# 安装 hook
+skill-seed hook install
+
+# 卸载 hook
+skill-seed hook uninstall
+```
+
+## 工作流程
+
+```bash
+# 1. 初始化项目
+skill-seed init
+
+# 2. 学习历史模式
+skill-seed learn --max=50
+
+# 3. 生成 Skills
+skill-seed generate-skills
+
+# 4. 在 Claude Code 中使用
+#（Skills 会自动被发现）
+
+# 5. 继续学习...
+skill-seed learn --since=7
+skill-seed generate-skills
+```
+
+## 配置
+
+编辑 `.seed/skill-seed/config.yaml`:
 
 ```yaml
 project:
-  name: "your-project"
-  initialized_at: "2024-01-15T10:30:00Z"
-  git_remote: "https://github.com/user/repo.git"
+  name: my-project
+  git_remote: git@github.com:user/repo.git
+  initialized_at: 2026-03-19T00:00:00Z
 
 claude:
   enabled: true
   timeout_seconds: 30
-  fallback_to_basic: true  # Claude 不可用时降级到基础检查
+  fallback_to_basic: true
 
 learning:
-  min_samples_for_rule: 3      # 至少出现 3 次才生成规则
-  auto_learn_interval_days: 7  # 自动学习间隔（天）
-  max_history_analyze: 1000    # 最多分析 1000 个提交
-
-checking:
-  interactive: true      # 交互式确认
-  auto_fix: true         # 支持自动修复
-  severity_levels:
-    - error
-    - warning
-    - info
-  exclude_patterns:
-    - "vendor/*"
-    - "node_modules/*"
-    - "*.pb.go"
-    - "*.gen.go"
+  max_history_analyze: 100
+  min_samples_for_rule: 3
 ```
 
-## 🤖 Claude 集成
-
-### 前置要求
-
-安装 Claude CLI：
+## 环境变量
 
 ```bash
-# macOS
-brew install claude
-
-# Linux
-curl -sL https://claude.ai/install.sh | bash
+# Claude API Key（用于深度分析）
+export ANTHROPIC_API_KEY=your-api-key-here
 ```
 
-### 验证
+## 生成的 Skills 结构
+
+```
+~/.claude/skills/skill-seed-skills/
+├── SKILL.md                      # 主入口
+└── references/                   # 分类知识
+    ├── naming-patterns/          # 命名模式
+    ├── error-handling-patterns/  # 错误处理
+    ├── structure-patterns/       # 代码结构
+    ├── concurrency-patterns/     # 并发模式
+    └── testing-patterns/         # 测试模式
+```
+
+## 为什么选择 Skill-Seed？
+
+### vs 静态文档
+
+| 特性 | 静态文档 | Skill-Seed |
+|------|---------|-----------|
+| 更新方式 | 手动维护 | 自动从 Git 学习 |
+| 准确性 | 可能过时 | 始终反映最新代码 |
+| 代码示例 | 需要手动编写 | 自动提取 |
+| 覆盖率 | 有限 | 全面分析 |
+
+### vs LLM Context
+
+| 特性 | LLM Context | Skill-Seed |
+|------|------------|-----------|
+| Token 消耗 | 每次都消耗 | 一次学习，多次使用 |
+| 上下文限制 | 受限 | 不受限 |
+| 成本 | 高 | 低 |
+| 准确性 | 可能幻觉 | 基于实际代码 |
+
+## 命令参考
 
 ```bash
-claude --version
+skill-seed init              # 初始化
+skill-seed learn [flags]      # 学习 Git 历史
+skill-seed scan [flags]       # 扫描当前项目
+skill-seed analyze <files>    # 分析特定文件
+skill-seed check              # 手动运行检查
+skill-seed generate-skills    # 生成 Skills
+skill-seed view patterns      # 查看模式
+skill-seed view rules         # 查看规则
+skill-seed hook install       # 安装 hook
+skill-seed hook uninstall     # 卸载 hook
 ```
 
-### 离线环境
+## 项目状态
 
-如果 Claude 不可用，grow-check 会自动降级到基础规则检查：
+- ✅ 基础学习功能
+- ✅ Claude 深度分析
+- ✅ Skills 生成
+- ✅ Git Hooks 集成
+- ✅ 国际化支持（中英文）
+- 🔄 更多 AI Agents 支持（开发中）
 
-```yaml
-claude:
-  enabled: true
-  fallback_to_basic: true
-```
+## 贡献
 
-## 🔧 工作原理
+欢迎贡献！请随时提交 Issue 或 Pull Request。
 
-### 1. 学习阶段
+## 许可证
 
-```mermaid
-graph LR
-    A[Git Commits] --> B[Claude 分析]
-    B --> C[提取模式]
-    C --> D[生成规则]
-    D --> E[BoltDB 存储]
-```
+Apache License 2.0
 
-### 2. 检查阶段
+## 致谢
 
-```mermaid
-graph LR
-    A[Git Add] --> B[Pre-commit 钩子]
-    B --> C[基础检查]
-    C --> D[Claude 深度分析]
-    D --> E[合并结果]
-    E --> F{交互式处理}
-    F --> G[自动修复]
-    F --> H[忽略]
-    F --> I[终止提交]
-```
-
-## 🧪 测试
-
-```bash
-# 运行所有测试
-make test
-
-# 生成 HTML 覆盖率报告
-make test-html
-```
-
-## 📝 开发
-
-```bash
-# 格式化代码
-make fmt
-
-# 代码检查
-make lint
-
-# 本地运行
-make run ARGS="init"
-```
-
-## 🤝 贡献
-
-欢迎贡献！请查看 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-## 📄 许可证
-
-MIT License - 详见 [LICENSE](LICENSE)
-
-## 🙏 致谢
-
+- [Claude Code](https://code.claude.com) - AI 编程助手
 - [Cobra](https://github.com/spf13/cobra) - CLI 框架
 - [BoltDB](https://github.com/etcd-io/bbolt) - 嵌入式数据库
-- [Claude](https://claude.ai) - AI 代码分析
 
 ---
 
-**Made with ❤️ by the OpenClaw Team**
+**让 AI 更懂你的代码！** 🌱

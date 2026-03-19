@@ -1,4 +1,4 @@
-module github.com/openclaw-coding/grow-check
+module github.com/openclaw-coding/skill-seed
 
 go 1.25.0
 

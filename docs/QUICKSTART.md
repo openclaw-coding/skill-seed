@@ -1,28 +1,28 @@
 # 快速开始指南
 
-## 🎯 5 分钟上手 grow-check
+## 🎯 5 分钟上手 skill-seed
 
 ### 第一步：安装
 
 ```bash
 # 下载最新版本
-curl -sL https://github.com/openclaw-coding/grow-check/releases/latest/download/grow-check-$(uname -s)-$(uname -m) -o grow-check
-chmod +x grow-check
-sudo mv grow-check /usr/local/bin/
+curl -sL https://github.com/openclaw-coding/skill-seed/releases/latest/download/skill-seed-$(uname -s)-$(uname -m) -o skill-seed
+chmod +x skill-seed
+sudo mv skill-seed /usr/local/bin/
 
 # 验证安装
-grow-check --version
+skill-seed --version
 ```
 
 ### 第二步：初始化项目
 
 ```bash
 cd /path/to/your/go-project
-grow-check init
+skill-seed init
 ```
 
 这会：
-- ✅ 创建 `.skills/grow-check/` 目录
+- ✅ 创建 `.skills/skill-seed/` 目录
 - ✅ 生成配置文件 `config.yaml`
 - ✅ 安装 Git pre-commit 钩子
 - ✅ 初始化 BoltDB 数据库
@@ -31,7 +31,7 @@ grow-check init
 
 ```bash
 # 学习最近 30 天的提交历史
-grow-check learn --since=30d
+skill-seed learn --since=30d
 ```
 
 输出示例：
@@ -77,10 +77,10 @@ Your choice [1-4]: 1
 
 ```bash
 # 查看学习到的模式
-grow-check patterns
+skill-seed patterns
 
 # 查看生成的规则
-grow-check rules
+skill-seed rules
 ```
 
 ## 🎨 常见使用场景
@@ -90,10 +90,10 @@ grow-check rules
 ```bash
 # 1. 初始化
 cd new-project
-grow-check init
+skill-seed init
 
 # 2. 从历史学习（如果项目已有历史）
-grow-check learn --max=200
+skill-seed learn --max=200
 
 # 3. 开始正常开发
 git add .
@@ -104,19 +104,19 @@ git commit -m "feat: add feature"
 
 ```bash
 # 每周运行一次，学习新的提交
-grow-check learn --since=7
+skill-seed learn --since=7
 ```
 
 ### 场景 3：手动检查（不提交）
 
 ```bash
 # 想在提交前看看检查结果
-grow-check check
+skill-seed check
 ```
 
 ### 场景 4：禁用交互式确认
 
-编辑 `.skills/grow-check/config.yaml`：
+编辑 `.skills/skill-seed/config.yaml`：
 
 ```yaml
 checking:
@@ -185,18 +185,18 @@ learning:
 
 2. 重新安装：
    ```bash
-   grow-check init  # 会重新安装 hook
+   skill-seed init  # 会重新安装 hook
    ```
 
 ### 问题 3：学习速度慢
 
 **症状**：
-`grow-check learn` 运行很慢
+`skill-seed learn` 运行很慢
 
 **解决方案**：
 1. 减少提交数量：
    ```bash
-   grow-check learn --max=50
+   skill-seed learn --max=50
    ```
 
 2. 禁用 Claude 学习（只用基础规则）：
@@ -209,39 +209,39 @@ learning:
 
 ### 自定义规则
 
-编辑 `.skills/grow-check/memory/rules.json`（未来版本支持）
+编辑 `.skills/skill-seed/memory/rules.json`（未来版本支持）
 
 ### 导出/导入模式
 
 ```bash
 # 导出模式（未来版本）
-grow-check export > patterns.json
+skill-seed export > patterns.json
 
 # 导入模式（未来版本）
-grow-check import < patterns.json
+skill-seed import < patterns.json
 ```
 
 ## 🎯 最佳实践
 
-1. **定期学习**：每周运行 `grow-check learn --since=7`
-2. **审查规则**：定期运行 `grow-check rules` 查看生成的规则
+1. **定期学习**：每周运行 `skill-seed learn --since=7`
+2. **审查规则**：定期运行 `skill-seed rules` 查看生成的规则
 3. **调整配置**：根据项目特点调整 `exclude_patterns`
-4. **团队共享**：将 `.skills/grow-check/config.yaml` 提交到 Git
+4. **团队共享**：将 `.skills/skill-seed/config.yaml` 提交到 Git
 
 ## ❓ 常见问题
 
-**Q: grow-check 会影响提交速度吗？**
+**Q: skill-seed 会影响提交速度吗？**
 A: 会有轻微影响（通常 < 2 秒），但能避免潜在问题。
 
 **Q: 可以在 CI/CD 中使用吗？**
-A: 可以！在 CI 中运行 `grow-check check`。
+A: 可以！在 CI 中运行 `skill-seed check`。
 
 **Q: 支持非 Go 项目吗？**
 A: 目前主要针对 Go，未来会支持更多语言。
 
 **Q: 数据存储在哪里？**
-A: 所有数据存储在项目的 `.skills/grow-check/memory/` 目录。
+A: 所有数据存储在项目的 `.skills/skill-seed/memory/` 目录。
 
 ---
 
-**需要帮助？** 查看 [完整文档](README.md) 或 [提交 Issue](https://github.com/openclaw-coding/grow-check/issues)
+**需要帮助？** 查看 [完整文档](README.md) 或 [提交 Issue](https://github.com/openclaw-coding/skill-seed/issues)
