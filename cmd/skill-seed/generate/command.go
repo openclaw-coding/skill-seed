@@ -27,13 +27,12 @@ This command reads the patterns learned from Git history and generates
 a skill that can be used by Claude Code to understand your project's
 coding conventions and best practices.
 
-The generated skill will be output to ~/.claude/skills/skill-seed-skills/
+The generated skill will be output to .claude/skills/skill-seed-skills/
 by default, where Claude Code can automatically discover it.`,
 		RunE: runGenerate,
 	}
 
-	generateCmd.Flags().StringVarP(&outputPath, "output", "o",
-		filepath.Join(os.Getenv("HOME"), ".claude/skills"), "Output path for generated skills")
+	generateCmd.Flags().StringVarP(&outputPath, "output", "o", ".claude/skills", "Output path for generated skills")
 	generateCmd.Flags().BoolVarP(&force, "force", "f", false,
 		"Overwrite existing skills without asking")
 
@@ -54,7 +53,7 @@ func runGenerate(cmd *cobra.Command, args []string) error {
 	}
 
 	// 确定 skill 路径
-	skillPath := filepath.Join(projectRoot, ".seed", "skill-seed")
+	skillPath := filepath.Join(projectRoot, ".skill-seed")
 
 	// 检查 skill 是否初始化
 	if _, err := os.Stat(skillPath); os.IsNotExist(err) {

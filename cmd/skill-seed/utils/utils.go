@@ -8,8 +8,8 @@ import (
 	"github.com/openclaw-coding/skill-seed/internal/i18n"
 )
 
-// FindSkillPath 查找 .seed/skill-seed 目录
-// 从当前目录向上查找，直到找到包含 .seed/skill-seed 的目录
+// FindSkillPath 查找 .skill-seed 目录
+// 从当前目录向上查找，直到找到包含 .skill-seed 的目录
 func FindSkillPath() (string, error) {
 	// 从当前目录开始
 	dir, err := os.Getwd()
@@ -17,9 +17,9 @@ func FindSkillPath() (string, error) {
 		return "", fmt.Errorf("failed to get current directory: %w", err)
 	}
 
-	// 向上查找 .seed/skill-seed 目录
+	// 向上查找 .skill-seed 目录
 	for {
-		skillPath := filepath.Join(dir, ".seed", "skill-seed")
+		skillPath := filepath.Join(dir, ".skill-seed")
 		if _, err := os.Stat(skillPath); err == nil {
 			return skillPath, nil
 		}
@@ -60,5 +60,5 @@ func RequireSkillPath() (string, error) {
 
 // GetProjectRoot 从 skillPath 获取项目根目录
 func GetProjectRoot(skillPath string) string {
-	return filepath.Dir(filepath.Dir(skillPath))
+	return filepath.Dir(skillPath)
 }

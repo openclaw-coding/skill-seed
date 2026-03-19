@@ -8,6 +8,7 @@ import (
 
 	"github.com/openclaw-coding/skill-seed/cmd/skill-seed/utils"
 	"github.com/openclaw-coding/skill-seed/internal/checker"
+	"github.com/openclaw-coding/skill-seed/internal/generator"
 	"github.com/openclaw-coding/skill-seed/internal/git"
 	"github.com/openclaw-coding/skill-seed/internal/i18n"
 	"github.com/openclaw-coding/skill-seed/internal/storage"
@@ -16,6 +17,10 @@ import (
 
 // Cmd 返回扫描命令
 func Cmd() *cobra.Command {
+	var scanAll bool
+	var generateSkills bool
+	var outputPath string
+
 	scanCmd := &cobra.Command{
 		Use:   "scan",
 		Short: i18n.Get("cmd_scan_short"),
@@ -26,13 +31,18 @@ This will:
   - Use Claude to analyze code patterns
   - Learn from the current codebase state
   - Mark current commit as learned
+  - Optionally generate Claude skills
 
 Examples:
   skill-seed scan
-  skill-seed scan --all`,
+  skill-seed scan --all
+  skill-seed scan --generate-skills
+  skill-seed scan --generate-skills --output .claude/skills`,
 		Run: func(cmd *cobra.Command, args []string) {
-			scanAll, _ := cmd.Flags().GetBool("all")
-			if err := runScan(scanAll); err != nil {
+			scanAll, _ = cmd.Flags().GetBool("all")
+			generateSkills, _ = cmd.Flags().GetBool("generate-skills")
+			outputPath, _ = cmd.Flags().GetString("output")
+			if err := runScan(scanAll, generateSkills, outputPath); err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err)
 				os.Exit(1)
 			}
@@ -40,11 +50,13 @@ Examples:
 	}
 
 	scanCmd.Flags().BoolP("all", "a", false, "Scan all files (not just Go files)")
+	scanCmd.Flags().BoolP("generate-skills", "g", false, "Generate Claude skills after scanning")
+	scanCmd.Flags().StringP("output", "o", ".claude/skills", "Output path for generated skills")
 
 	return scanCmd
 }
 
-func runScan(scanAll bool) error {
+func runScan(scanAll bool, generateSkills bool, outputPath string) error {
 	// Find skill path
 	skillPath, err := utils.RequireSkillPath()
 	if err != nil {
@@ -59,7 +71,6 @@ func runScan(scanAll bool) error {
 	if err != nil {
 		return fmt.Errorf("failed to create checker: %w", err)
 	}
-	defer chk.Close()
 
 	fmt.Println(i18n.Get("scan_analyzing_project"))
 	fmt.Printf(i18n.Get("scan_project_root")+"\n", projectRoot)
@@ -96,6 +107,9 @@ func runScan(scanAll bool) error {
 		return err
 	}
 
+	// Close checker before accessing database again
+	chk.Close()
+
 	// Mark current commit as learned
 	gitOp := git.NewGitOperator(projectRoot)
 	currentHash, err := gitOp.GetCurrentCommitHash()
@@ -110,6 +124,23 @@ func runScan(scanAll bool) error {
 	fmt.Println("")
 	fmt.Println(i18n.Get("scan_completed"))
 
+	// Generate skills if requested
+	if generateSkills {
+		fmt.Println("")
+		fmt.Println("Generating Claude skills...")
+
+		gen, err := generator.New(skillPath, projectRoot)
+		if err != nil {
+			return fmt.Errorf("failed to create generator: %w", err)
+		}
+		defer gen.Close()
+
+		outputDir := filepath.Join(outputPath, "skill-seed-skills")
+		if err := gen.Generate(outputDir); err != nil {
+			return fmt.Errorf("failed to generate skills: %w", err)
+		}
+	}
+
 	return nil
 }
 
@@ -123,7 +154,7 @@ func findGoFiles(root string) ([]string, error) {
 		// Skip hidden directories and common exclude dirs
 		if info.IsDir() {
 			name := filepath.Base(path)
-			if name == ".git" || name == ".seed" || name == "vendor" || name == "node_modules" {
+			if name == ".git" || name == ".skill-seed" || name == "vendor" || name == "node_modules" {
 				return filepath.SkipDir
 			}
 			return nil
@@ -153,7 +184,7 @@ func findAllFiles(root string) ([]string, error) {
 		// Skip hidden directories and common exclude dirs
 		if info.IsDir() {
 			name := filepath.Base(path)
-			if name == ".git" || name == ".seed" || name == "vendor" || name == "node_modules" {
+			if name == ".git" || name == ".skill-seed" || name == "vendor" || name == "node_modules" {
 				return filepath.SkipDir
 			}
 			return nil
