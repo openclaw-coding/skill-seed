@@ -1,0 +1,35 @@
+# grow-check 示例配置
+# 复制此文件到 .skills/grow-check/config.yaml
+
+project:
+  name: "your-project"
+  initialized_at: "2024-01-01T00:00:00Z"
+  git_remote: "https://github.com/user/repo.git"
+
+# Claude AI 集成配置
+claude:
+  enabled: true              # 是否启用 Claude 分析
+  timeout_seconds: 30        # Claude 分析超时时间（秒）
+  fallback_to_basic: true    # Claude 不可用时降级到基础检查
+
+# 学习配置
+learning:
+  min_samples_for_rule: 3        # 模式至少出现几次才生成规则
+  auto_learn_interval_days: 7    # 自动学习间隔（天）
+  max_history_analyze: 1000      # 最多分析多少个历史提交
+
+# 检查配置
+checking:
+  interactive: true          # 是否启用交互式确认
+  auto_fix: true             # 是否支持自动修复
+  severity_levels:           # 严重级别
+    - error                  # 错误 - 必须修复
+    - warning                # 警告 - 建议修复
+    - info                   # 信息 - 可选修复
+  exclude_patterns:          # 排除的文件模式
+    - "vendor/*"             # 依赖目录
+    - "node_modules/*"       # Node.js 依赖
+    - "*.pb.go"              # Protobuf 生成文件
+    - "*.gen.go"             # 代码生成文件
+    - "*/mocks/*"            # Mock 文件
+    - "**/testdata/*"        # 测试数据
