@@ -75,75 +75,74 @@ func (c *Client) AnalyzeCode(files []models.FileChange, analysisContext *models.
 	return result, nil
 }
 
-// buildPrompt 构建分析提示词
+// buildPrompt build analysis prompt
 func (c *Client) buildPrompt(files []models.FileChange, analysisContext *models.AnalysisContext) string {
 	var sb strings.Builder
 
-	sb.WriteString("你是一位资深的代码审查专家。请分析以下代码变更：\n\n")
+	sb.WriteString("You are a senior code review expert. Please analyze the following code changes:\n\n")
 
-	// 项目上下文
-	sb.WriteString("## 项目上下文\n")
-	sb.WriteString(fmt.Sprintf("- 项目类型: %s\n", analysisContext.ProjectType))
-	
+	// Project context
+	sb.WriteString("## Project Context\n")
+	sb.WriteString(fmt.Sprintf("- Project Type: %s\n", analysisContext.ProjectType))
+
 	if len(analysisContext.HistoricalBugs) > 0 {
-		sb.WriteString("- 历史 bug 模式:\n")
+		sb.WriteString("- Historical Bug Patterns:\n")
 		for _, bug := range analysisContext.HistoricalBugs {
 			sb.WriteString(fmt.Sprintf("  - %s\n", bug))
 		}
 	}
 
 	if analysisContext.TeamConventions != "" {
-		sb.WriteString(fmt.Sprintf("- 团队规范: %s\n", analysisContext.TeamConventions))
+		sb.WriteString(fmt.Sprintf("- Team Conventions: %s\n", analysisContext.TeamConventions))
 	}
 
-	// 学习到的模式
+	// Learned patterns
 	if len(analysisContext.LearnedPatterns) > 0 {
-		sb.WriteString("\n## 学习到的代码模式\n")
+		sb.WriteString("\n## Learned Code Patterns\n")
 		for _, pattern := range analysisContext.LearnedPatterns {
-			sb.WriteString(fmt.Sprintf("- [%s] %s (置信度: %.2f)\n", 
+			sb.WriteString(fmt.Sprintf("- [%s] %s (confidence: %.2f)\n",
 				pattern.Type, pattern.Description, pattern.Confidence))
 		}
 	}
 
-	// 变更文件
-	sb.WriteString("\n## 变更文件\n")
+	// Changed files - only analyze diff
+	sb.WriteString("\n## Changed Files\n")
 	for i, file := range files {
-		sb.WriteString(fmt.Sprintf("\n### 文件 %d: %s\n", i+1, file.Path))
+		sb.WriteString(fmt.Sprintf("\n### File %d: %s\n", i+1, file.Path))
 		if file.Diff != "" {
 			sb.WriteString("```diff\n")
 			sb.WriteString(file.Diff)
 			sb.WriteString("\n```\n")
 		} else {
-			sb.WriteString("```\n")
-			sb.WriteString(file.Content)
-			sb.WriteString("\n```\n")
+			// If no diff, don't send content
+			sb.WriteString("(No changes detected)\n")
 		}
 	}
 
-	// 分析要求
+	// Analysis requirements
 	sb.WriteString(`
-## 请分析以下方面：
+## Please analyze the following aspects:
 
-1. **潜在问题**：是否存在 bug、逻辑错误、性能问题
-2. **模式匹配**：是否符合项目的历史编码模式
-3. **回归风险**：是否可能引入回归问题
-4. **改进建议**：具体的修复或优化建议
+1. **Potential Issues**: Are there bugs, logic errors, or performance issues?
+2. **Pattern Matching**: Does it match the project's historical coding patterns?
+3. **Regression Risk**: Could it introduce regression issues?
+4. **Improvement Suggestions**: Specific fixes or optimization recommendations
 
-## 返回格式
+## Return Format
 
-请以 JSON 格式返回，格式如下：
+Please return in JSON format:
 ` + "```json\n" + `
 {
   "issues": [
     {
-      "file": "文件路径",
-      "line": 行号,
+      "file": "file path",
+      "line": line number,
       "severity": "error|warning|info",
-      "message": "问题描述",
-      "suggestion": "修复建议"
+      "message": "issue description",
+      "suggestion": "fix suggestion"
     }
   ],
-  "summary": "整体分析摘要",
+  "summary": "overall analysis summary",
   "confidence": 0.85
 }
 ` + "```\n")
@@ -197,45 +196,45 @@ func (c *Client) LearnFromCommit(commit *models.CommitInfo, diff string, existin
 	return patterns, nil
 }
 
-// buildLearnPrompt 构建学习提示词
+// buildLearnPrompt build learning prompt
 func (c *Client) buildLearnPrompt(commit *models.CommitInfo, diff string, existingPatterns []models.CodePattern) string {
 	var sb strings.Builder
 
-	sb.WriteString("分析以下 Git 提交，识别代码模式和规范：\n\n")
-	sb.WriteString(fmt.Sprintf("## 提交信息\n"))
+	sb.WriteString("Analyze the following Git commit to identify code patterns and conventions:\n\n")
+	sb.WriteString(fmt.Sprintf("## Commit Info\n"))
 	sb.WriteString(fmt.Sprintf("- Hash: %s\n", commit.Hash))
 	sb.WriteString(fmt.Sprintf("- Message: %s\n", commit.Message))
 	sb.WriteString(fmt.Sprintf("- Author: %s\n", commit.Author))
 	sb.WriteString(fmt.Sprintf("- Time: %s\n", commit.Timestamp.Format(time.RFC3339)))
 
-	sb.WriteString("\n## 代码变更\n")
+	sb.WriteString("\n## Code Changes\n")
 	sb.WriteString("```diff\n")
 	sb.WriteString(diff)
 	sb.WriteString("\n```\n")
 
 	if len(existingPatterns) > 0 {
-		sb.WriteString("\n## 已知的代码模式\n")
+		sb.WriteString("\n## Known Code Patterns\n")
 		for _, p := range existingPatterns {
 			sb.WriteString(fmt.Sprintf("- [%s] %s\n", p.Type, p.Description))
 		}
 	}
 
 	sb.WriteString(`
-## 分析任务
+## Analysis Tasks
 
-1. 识别新的代码模式（命名、结构、错误处理等）
-2. 判断是否是 bug fix，如果是，记录错误模式
-3. 提取团队编码习惯
+1. Identify new code patterns (naming, structure, error handling, etc.)
+2. Determine if it's a bug fix, if so, record the error pattern
+3. Extract team coding conventions
 
-## 返回格式
+## Return Format
 
-以 JSON 数组返回发现的新模式：
+Return discovered patterns in JSON array:
 ` + "```json\n" + `
 [
   {
     "type": "naming|structure|error_handling|concurrency|testing|comment",
-    "description": "模式描述",
-    "example": "代码示例",
+    "description": "pattern description",
+    "example": "code example",
     "auto_fixable": true
   }
 ]

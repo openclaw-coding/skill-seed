@@ -21,19 +21,36 @@ func NewGitOperator(repoPath string) *GitOperator {
 	return &GitOperator{repoPath: repoPath}
 }
 
-// GetStagedFiles 获取暂存区文件
+// GetStagedFiles get staged files
 func (g *GitOperator) GetStagedFiles() ([]string, error) {
-	cmd := exec.Command("git", "diff", "--cached", "--name-only", "--diff-filter=ACM")
+	cmd := exec.Command("git", "status", "--porcelain")
 	cmd.Dir = g.repoPath
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get staged files: %w", err)
 	}
 
-	files := strings.Split(strings.TrimSpace(string(output)), "\n")
-	if len(files) == 1 && files[0] == "" {
-		return []string{}, nil
+	// Parse output: M filename, MM filename, A filename, etc.
+	// Git status output format: XY filename
+	// X = staged status, Y = work tree status
+	// We only care about staged files (X is not space, ?, !)
+	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+	files := make([]string, 0)
+
+	for _, line := range lines {
+		if len(line) < 4 {
+			continue
+		}
+
+		status := line[0]
+		// Check if file is staged: status is M, M, A, R, C, etc. (not space, ?, !)
+		if status != ' ' && status != '?' && status != '!' {
+			// Extract filename (starts at position 3)
+			filename := strings.TrimSpace(line[3:])
+			files = append(files, filename)
+		}
 	}
+
 	return files, nil
 }
 
@@ -150,25 +167,24 @@ func (g *GitOperator) IsGitRepo() bool {
 	return err == nil
 }
 
-// InstallPreCommitHook 安装 pre-commit 钩子
+// InstallPreCommitHook installs pre-commit hook
 func (g *GitOperator) InstallPreCommitHook(skillPath string) error {
 	hookPath := filepath.Join(g.repoPath, ".git", "hooks", "pre-commit")
-	skillHookPath := filepath.Join(skillPath, "hooks", "pre-commit")
 
-	// 检查是否已存在钩子
+	// Check if hook already exists
 	if _, err := os.Stat(hookPath); err == nil {
-		// 读取现有内容
+		// Read existing content
 		content, err := os.ReadFile(hookPath)
 		if err != nil {
 			return fmt.Errorf("failed to read existing hook: %w", err)
 		}
 
-		// 如果已经包含我们的钩子，跳过
-		if strings.Contains(string(content), skillPath) {
+		// If it already contains our hook, skip
+		if strings.Contains(string(content), "grow-check") {
 			return nil
 		}
 
-		// 创建链式调用
+		// Create chain call
 		newContent := fmt.Sprintf(`#!/bin/sh
 # Chain loading for multiple hooks (preserving existing hooks)
 
@@ -176,8 +192,8 @@ func (g *GitOperator) InstallPreCommitHook(skillPath string) error {
 %s
 
 # grow-check hook
-%s "$@"
-`, string(content), skillHookPath)
+grow-check check || exit $?
+`, string(content))
 
 		if err := os.WriteFile(hookPath, []byte(newContent), 0755); err != nil {
 			return fmt.Errorf("failed to update hook: %w", err)
@@ -185,16 +201,11 @@ func (g *GitOperator) InstallPreCommitHook(skillPath string) error {
 		return nil
 	}
 
-	// 创建符号链接或新脚本
-	relPath, err := filepath.Rel(filepath.Dir(hookPath), skillHookPath)
-	if err != nil {
-		relPath = skillHookPath
-	}
-
-	content := fmt.Sprintf(`#!/bin/sh
+	// Create new hook script
+	content := `#!/bin/sh
 # grow-check pre-commit hook
-%s "$@"
-`, relPath)
+grow-check check || exit $?
+`
 
 	if err := os.WriteFile(hookPath, []byte(content), 0755); err != nil {
 		return fmt.Errorf("failed to create hook: %w", err)

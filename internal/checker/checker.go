@@ -2,6 +2,7 @@ package checker
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"github.com/openclaw-coding/grow-check/internal/config"
 	"github.com/openclaw-coding/grow-check/internal/git"
 	"github.com/openclaw-coding/grow-check/internal/i18n"
+	"github.com/openclaw-coding/grow-check/internal/output"
 	"github.com/openclaw-coding/grow-check/internal/storage"
 	"github.com/openclaw-coding/grow-check/pkg/models"
 )
@@ -71,7 +73,8 @@ func (c *Checker) Run() error {
 		return nil
 	}
 
-	printf(i18n.Get("check_checking_files"), len(files))
+	fmt.Printf(i18n.Get("check_checking_files"), len(files))
+	fmt.Println("")
 
 	// 2. Filter files
 	files = c.filterFiles(files)
@@ -105,12 +108,14 @@ func (c *Checker) Run() error {
 	// 5. Claude deep analysis
 	var claudeIssues []models.Issue
 	if c.config.Claude.Enabled && c.claude.IsAvailable() {
-		print(i18n.Get("check_analyzing_claude"))
+		fmt.Print(i18n.Get("check_analyzing_claude"))
+		fmt.Println("")
 
 		context := c.buildAnalysisContext()
 		result, err := c.claude.AnalyzeCode(fileChanges, context)
 		if err != nil {
-			printf(i18n.Get("check_claude_failed"), err)
+			fmt.Printf(i18n.Get("check_claude_failed"), err)
+			fmt.Println("")
 		} else if result != nil {
 			claudeIssues = result.Issues
 		}
@@ -121,7 +126,8 @@ func (c *Checker) Run() error {
 
 	// 7. Handle results
 	if len(allIssues) == 0 {
-		print(i18n.Get("check_no_issues"))
+		fmt.Print(i18n.Get("check_no_issues"))
+		fmt.Println("")
 		return nil
 	}
 
@@ -229,22 +235,18 @@ func (c *Checker) buildAnalysisContext() *models.AnalysisContext {
 
 // handleIssues handle discovered issues
 func (c *Checker) handleIssues(issues []models.Issue) error {
-	printf(i18n.Get("check_found_issues"), len(issues))
+	fmt.Printf(i18n.Get("check_found_issues"), len(issues))
+	fmt.Println("")
 
 	for i, issue := range issues {
-		severity := "❌"
-		if issue.Severity == "warning" {
-			severity = "⚠"
-		} else if issue.Severity == "info" {
-			severity = "ℹ"
-		}
+		label := output.SeverityLabel(issue.Severity)
 
-		printf("%d. %s %s:%d\n", i+1, severity, issue.File, issue.Line)
-		printf("   %s\n", issue.Message)
+		fmt.Printf("%d. %s %s:%d\n", i+1, label, issue.File, issue.Line)
+		fmt.Printf("   %s %s\n", label, issue.Message)
 		if issue.Suggestion != "" {
-			printf("   💡 %s\n", issue.Suggestion)
+			output.Dim("   Suggestion: %s\n", issue.Suggestion)
 		}
-		println("")
+		fmt.Println("")
 	}
 
 	// Interactive handling
@@ -264,12 +266,12 @@ func (c *Checker) handleIssues(issues []models.Issue) error {
 
 // interactiveHandler interactive handling
 func (c *Checker) interactiveHandler(issues []models.Issue) error {
-	println(i18n.Get("check_interactive_options"))
-	println(i18n.Get("check_option_autofix"))
-	println(i18n.Get("check_option_details"))
-	println(i18n.Get("check_option_ignore"))
-	println(i18n.Get("check_option_abort"))
-	print(i18n.Get("check_choice_prompt"))
+	fmt.Println(i18n.Get("check_interactive_options"))
+	fmt.Println(i18n.Get("check_option_autofix"))
+	fmt.Println(i18n.Get("check_option_details"))
+	fmt.Println(i18n.Get("check_option_ignore"))
+	fmt.Println(i18n.Get("check_option_abort"))
+	fmt.Print(i18n.Get("check_choice_prompt"))
 
 	var choice int
 	fmt.Scanln(&choice)
@@ -280,7 +282,7 @@ func (c *Checker) interactiveHandler(issues []models.Issue) error {
 		if c.config.Checking.AutoFix {
 			return c.autoFix(issues)
 		}
-		println(i18n.Get("check_autofix_disabled"))
+		output.Warning(i18n.Get("check_autofix_disabled"))
 		return fmt.Errorf("auto-fix disabled")
 
 	case 2:
@@ -290,10 +292,10 @@ func (c *Checker) interactiveHandler(issues []models.Issue) error {
 
 	case 3:
 		// Ignore
-		print(i18n.Get("check_ignore_reason"))
+		fmt.Print(i18n.Get("check_ignore_reason"))
 		var reason string
 		fmt.Scanln(&reason)
-		printf(i18n.Get("check_ignored"), reason)
+		output.Success(i18n.Get("check_ignored"), reason)
 		return nil
 
 	case 4:
@@ -301,7 +303,7 @@ func (c *Checker) interactiveHandler(issues []models.Issue) error {
 		return fmt.Errorf(i18n.Get("check_aborted"))
 
 	default:
-		println(i18n.Get("check_invalid_choice"))
+		output.Error(i18n.Get("check_invalid_choice"))
 		return c.interactiveHandler(issues)
 	}
 }
@@ -312,23 +314,23 @@ func (c *Checker) autoFix(issues []models.Issue) error {
 	for _, issue := range issues {
 		// TODO: Implement auto-fix logic
 		// Can perform auto-fix based on pattern here
-		printf("⚠ Auto-fix not implemented for %s:%d\n", issue.File, issue.Line)
+		fmt.Printf(i18n.Get("check_autofix_not_impl")+"\n", issue.File, issue.Line)
 	}
 
 	if fixed > 0 {
-		printf("✅ Fixed %d issues\n", fixed)
+		fmt.Printf(i18n.Get("check_fixed_count")+"\n", fixed)
 	}
 
-	return fmt.Errorf("auto-fix not fully implemented yet")
+	return fmt.Errorf(i18n.Get("check_autofix_not_ready"))
 }
 
 // showDetails show details
 func (c *Checker) showDetails(issues []models.Issue) {
 	for _, issue := range issues {
-		printf("\n--- %s:%d ---\n", issue.File, issue.Line)
-		printf("Severity: %s\n", issue.Severity)
-		printf("Message: %s\n", issue.Message)
-		printf("Suggestion: %s\n", issue.Suggestion)
+		fmt.Printf("\n--- %s:%d ---\n", issue.File, issue.Line)
+		fmt.Printf("Severity: %s\n", issue.Severity)
+		fmt.Printf("Message: %s\n", issue.Message)
+		fmt.Printf("Suggestion: %s\n", issue.Suggestion)
 	}
 }
 
@@ -337,15 +339,65 @@ func (c *Checker) Close() error {
 	return c.store.Close()
 }
 
-// Helper functions for output
-func printf(format string, args ...interface{}) {
-	fmt.Printf(format, args...)
-}
+// AnalyzeFiles analyze specific files
+func (c *Checker) AnalyzeFiles(filePaths []string) error {
+	// Prepare file changes
+	fileChanges := make([]models.FileChange, 0, len(filePaths))
 
-func print(s string) {
-	fmt.Print(s)
-}
+	for _, filePath := range filePaths {
+		// Read file content
+		content, err := os.ReadFile(filePath)
+		if err != nil {
+			fmt.Printf(i18n.Get("check_read_file_failed")+"\n", filePath, err)
+			continue
+		}
 
-func println(args ...interface{}) {
-	fmt.Println(args...)
+		// Get relative path for display
+		relPath, err := filepath.Rel(c.projectRoot, filePath)
+		if err != nil {
+			relPath = filePath
+		}
+
+		fileChanges = append(fileChanges, models.FileChange{
+			Path:    relPath,
+			Content: string(content),
+			Diff:    "", // No diff for direct file analysis
+		})
+	}
+
+	if len(fileChanges) == 0 {
+		fmt.Println(i18n.Get("check_no_valid_files"))
+		return nil
+	}
+
+	// Run basic checks
+	basicIssues := c.runBasicChecks(fileChanges)
+
+	// Claude deep analysis
+	var claudeIssues []models.Issue
+	if c.config.Claude.Enabled && c.claude.IsAvailable() {
+		fmt.Print(i18n.Get("check_analyzing_claude"))
+		fmt.Println("")
+
+		context := c.buildAnalysisContext()
+		result, err := c.claude.AnalyzeCode(fileChanges, context)
+		if err != nil {
+			fmt.Printf(i18n.Get("check_claude_failed"), err)
+			fmt.Println("")
+		} else if result != nil {
+			claudeIssues = result.Issues
+		}
+	}
+
+	// Merge results
+	allIssues := append(basicIssues, claudeIssues...)
+
+	// Handle results
+	if len(allIssues) == 0 {
+		fmt.Print(i18n.Get("check_no_issues"))
+		fmt.Println("")
+		return nil
+	}
+
+	return c.handleIssues(allIssues)
 }
