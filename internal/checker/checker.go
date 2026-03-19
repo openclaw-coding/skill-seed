@@ -9,39 +9,40 @@ import (
 	"github.com/openclaw-coding/grow-check/internal/claude"
 	"github.com/openclaw-coding/grow-check/internal/config"
 	"github.com/openclaw-coding/grow-check/internal/git"
+	"github.com/openclaw-coding/grow-check/internal/i18n"
 	"github.com/openclaw-coding/grow-check/internal/storage"
 	"github.com/openclaw-coding/grow-check/pkg/models"
 )
 
-// Checker 代码检查器
+// Checker code checker
 type Checker struct {
-	config     *config.Config
-	store      *storage.Store
-	git        *git.GitOperator
-	claude     *claude.Client
-	skillPath  string
+	config      *config.Config
+	store       *storage.Store
+	git         *git.GitOperator
+	claude      *claude.Client
+	skillPath   string
 	projectRoot string
 }
 
-// New 创建检查器
+// New create checker
 func New(skillPath, projectRoot string) (*Checker, error) {
-	// 加载配置
+	// Load configuration
 	cfg, err := config.Load(skillPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load config: %w", err)
 	}
 
-	// 打开数据库
+	// Open database
 	dbPath := filepath.Join(skillPath, "memory", "project.db")
 	store, err := storage.New(dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open storage: %w", err)
 	}
 
-	// 创建 Git 操作器
+	// Create Git operator
 	gitOp := git.NewGitOperator(projectRoot)
 
-	// 创建 Claude 客户端
+	// Create Claude client
 	claudeClient := claude.NewClient(
 		"claude",
 		time.Duration(cfg.Claude.TimeoutSeconds)*time.Second,
@@ -58,9 +59,9 @@ func New(skillPath, projectRoot string) (*Checker, error) {
 	}, nil
 }
 
-// Run 运行检查
+// Run run check
 func (c *Checker) Run() error {
-	// 1. 获取暂存文件
+	// 1. Get staged files
 	files, err := c.git.GetStagedFiles()
 	if err != nil {
 		return fmt.Errorf("failed to get staged files: %w", err)
@@ -70,15 +71,15 @@ func (c *Checker) Run() error {
 		return nil
 	}
 
-	fmt.Printf("🔍 Checking %d files...\n", len(files))
+	printf(i18n.Get("check_checking_files"), len(files))
 
-	// 2. 过滤文件
+	// 2. Filter files
 	files = c.filterFiles(files)
 	if len(files) == 0 {
 		return nil
 	}
 
-	// 3. 准备文件数据
+	// 3. Prepare file data
 	fileChanges := make([]models.FileChange, 0, len(files))
 	for _, path := range files {
 		content, err := c.git.GetFileContent(path)
@@ -98,46 +99,46 @@ func (c *Checker) Run() error {
 		})
 	}
 
-	// 4. 基础检查
+	// 4. Basic checks
 	basicIssues := c.runBasicChecks(fileChanges)
 
-	// 5. Claude 深度分析
+	// 5. Claude deep analysis
 	var claudeIssues []models.Issue
 	if c.config.Claude.Enabled && c.claude.IsAvailable() {
-		fmt.Println("🤖 Analyzing with Claude...")
-		
+		print(i18n.Get("check_analyzing_claude"))
+
 		context := c.buildAnalysisContext()
 		result, err := c.claude.AnalyzeCode(fileChanges, context)
 		if err != nil {
-			fmt.Printf("⚠ Claude analysis failed: %v\n", err)
+			printf(i18n.Get("check_claude_failed"), err)
 		} else if result != nil {
 			claudeIssues = result.Issues
 		}
 	}
 
-	// 6. 合并结果
+	// 6. Merge results
 	allIssues := append(basicIssues, claudeIssues...)
 
-	// 7. 处理结果
+	// 7. Handle results
 	if len(allIssues) == 0 {
-		fmt.Println("✅ No issues found")
+		print(i18n.Get("check_no_issues"))
 		return nil
 	}
 
 	return c.handleIssues(allIssues)
 }
 
-// filterFiles 过滤文件
+// filterFiles filter files
 func (c *Checker) filterFiles(files []string) []string {
 	filtered := make([]string, 0, len(files))
-	
+
 	for _, file := range files {
-		// 只检查 Go 文件
+		// Only check Go files
 		if !strings.HasSuffix(file, ".go") {
 			continue
 		}
 
-		// 检查排除模式
+		// Check exclusion patterns
 		excluded := false
 		for _, pattern := range c.config.Checking.ExcludePatterns {
 			matched, err := filepath.Match(pattern, file)
@@ -155,42 +156,42 @@ func (c *Checker) filterFiles(files []string) []string {
 	return filtered
 }
 
-// runBasicChecks 运行基础检查
+// runBasicChecks run basic checks
 func (c *Checker) runBasicChecks(files []models.FileChange) []models.Issue {
 	var issues []models.Issue
 
-	// 加载规则
+	// Load rules
 	rules, err := c.store.GetAllRules()
 	if err != nil {
 		return issues
 	}
 
-	// 对每个文件应用规则
+	// Apply rules to each file
 	for _, file := range files {
 		for _, rule := range rules {
 			if rule.Type == models.PatternNaming {
-				// 简单的命名检查
+				// Simple naming check
 				issues = append(issues, c.checkNaming(file, rule)...)
 			}
-			// 可以添加更多规则类型
+			// Can add more rule types
 		}
 	}
 
 	return issues
 }
 
-// checkNaming 检查命名规范
+// checkNaming check naming convention
 func (c *Checker) checkNaming(file models.FileChange, rule models.Rule) []models.Issue {
 	var issues []models.Issue
-	
-	// 简单示例：检查是否包含下划线（Go 推荐驼峰命名）
+
+	// Simple example: check if underscore is included (Go recommends camelCase)
 	if strings.Contains(file.Path, "_") && !strings.HasSuffix(file.Path, "_test.go") {
 		issues = append(issues, models.Issue{
 			File:       file.Path,
 			Line:       1,
 			Severity:   "warning",
-			Message:    "文件名包含下划线，建议使用小写字母和连字符",
-			Suggestion: "重命名文件，移除下划线",
+			Message:    "File name contains underscore, recommend using lowercase letters and hyphens",
+			Suggestion: "Rename file, remove underscores",
 			PatternID:  rule.ID,
 		})
 	}
@@ -198,26 +199,26 @@ func (c *Checker) checkNaming(file models.FileChange, rule models.Rule) []models
 	return issues
 }
 
-// buildAnalysisContext 构建分析上下文
+// buildAnalysisContext build analysis context
 func (c *Checker) buildAnalysisContext() *models.AnalysisContext {
 	context := &models.AnalysisContext{
 		ProjectType:     "go",
-		TeamConventions: "遵循 Go 官方代码规范",
+		TeamConventions: "Follow Go official code standards",
 	}
 
-	// 加载学习到的模式
+	// Load learned patterns
 	patterns, err := c.store.GetAllPatterns()
 	if err == nil {
 		context.LearnedPatterns = patterns
 	}
 
-	// 获取最近的提交
+	// Get recent commits
 	commits, err := c.git.GetRecentCommits(10, time.Time{})
 	if err == nil {
 		context.RecentCommits = commits
 	}
 
-	// 获取历史 bug 模式
+	// Get historical bug patterns
 	bugs, err := c.store.GetMetadata("historical_bugs")
 	if err == nil && len(bugs) > 0 {
 		context.HistoricalBugs = strings.Split(string(bugs), "\n")
@@ -226,10 +227,10 @@ func (c *Checker) buildAnalysisContext() *models.AnalysisContext {
 	return context
 }
 
-// handleIssues 处理发现的问题
+// handleIssues handle discovered issues
 func (c *Checker) handleIssues(issues []models.Issue) error {
-	fmt.Printf("\n⚠ Found %d issues:\n\n", len(issues))
-	
+	printf(i18n.Get("check_found_issues"), len(issues))
+
 	for i, issue := range issues {
 		severity := "❌"
 		if issue.Severity == "warning" {
@@ -238,20 +239,20 @@ func (c *Checker) handleIssues(issues []models.Issue) error {
 			severity = "ℹ"
 		}
 
-		fmt.Printf("%d. %s %s:%d\n", i+1, severity, issue.File, issue.Line)
-		fmt.Printf("   %s\n", issue.Message)
+		printf("%d. %s %s:%d\n", i+1, severity, issue.File, issue.Line)
+		printf("   %s\n", issue.Message)
 		if issue.Suggestion != "" {
-			fmt.Printf("   💡 %s\n", issue.Suggestion)
+			printf("   💡 %s\n", issue.Suggestion)
 		}
-		fmt.Println()
+		println("")
 	}
 
-	// 交互式处理
+	// Interactive handling
 	if c.config.Checking.Interactive {
 		return c.interactiveHandler(issues)
 	}
 
-	// 非交互模式：有 error 级别问题就失败
+	// Non-interactive mode: fail if there are error-level issues
 	for _, issue := range issues {
 		if issue.Severity == "error" {
 			return fmt.Errorf("found %d error-level issues", len(issues))
@@ -261,77 +262,90 @@ func (c *Checker) handleIssues(issues []models.Issue) error {
 	return nil
 }
 
-// interactiveHandler 交互式处理
+// interactiveHandler interactive handling
 func (c *Checker) interactiveHandler(issues []models.Issue) error {
-	fmt.Println("Options:")
-	fmt.Println("1. Auto-fix (recommended)")
-	fmt.Println("2. View details")
-	fmt.Println("3. Ignore (with reason)")
-	fmt.Println("4. Abort commit")
-	fmt.Print("\nYour choice [1-4]: ")
+	println(i18n.Get("check_interactive_options"))
+	println(i18n.Get("check_option_autofix"))
+	println(i18n.Get("check_option_details"))
+	println(i18n.Get("check_option_ignore"))
+	println(i18n.Get("check_option_abort"))
+	print(i18n.Get("check_choice_prompt"))
 
 	var choice int
 	fmt.Scanln(&choice)
 
 	switch choice {
 	case 1:
-		// 自动修复
+		// Auto-fix
 		if c.config.Checking.AutoFix {
 			return c.autoFix(issues)
 		}
-		fmt.Println("⚠ Auto-fix is disabled in config")
+		println(i18n.Get("check_autofix_disabled"))
 		return fmt.Errorf("auto-fix disabled")
 
 	case 2:
-		// 查看详情
+		// View details
 		c.showDetails(issues)
-		return c.interactiveHandler(issues) // 重新选择
+		return c.interactiveHandler(issues) // Choose again
 
 	case 3:
-		// 忽略
-		fmt.Print("Please provide a reason: ")
+		// Ignore
+		print(i18n.Get("check_ignore_reason"))
 		var reason string
 		fmt.Scanln(&reason)
-		fmt.Printf("✅ Issues ignored. Reason: %s\n", reason)
+		printf(i18n.Get("check_ignored"), reason)
 		return nil
 
 	case 4:
-		// 终止提交
-		return fmt.Errorf("commit aborted by user")
+		// Abort commit
+		return fmt.Errorf(i18n.Get("check_aborted"))
 
 	default:
-		fmt.Println("Invalid choice")
+		println(i18n.Get("check_invalid_choice"))
 		return c.interactiveHandler(issues)
 	}
 }
 
-// autoFix 自动修复
+// autoFix auto fix
 func (c *Checker) autoFix(issues []models.Issue) error {
 	fixed := 0
 	for _, issue := range issues {
-		// TODO: 实现自动修复逻辑
-		// 这里可以根据 pattern 进行自动修复
-		fmt.Printf("⚠ Auto-fix not implemented for %s:%d\n", issue.File, issue.Line)
+		// TODO: Implement auto-fix logic
+		// Can perform auto-fix based on pattern here
+		printf("⚠ Auto-fix not implemented for %s:%d\n", issue.File, issue.Line)
 	}
 
 	if fixed > 0 {
-		fmt.Printf("✅ Fixed %d issues\n", fixed)
+		printf("✅ Fixed %d issues\n", fixed)
 	}
-	
+
 	return fmt.Errorf("auto-fix not fully implemented yet")
 }
 
-// showDetails 显示详细信息
+// showDetails show details
 func (c *Checker) showDetails(issues []models.Issue) {
 	for _, issue := range issues {
-		fmt.Printf("\n--- %s:%d ---\n", issue.File, issue.Line)
-		fmt.Printf("Severity: %s\n", issue.Severity)
-		fmt.Printf("Message: %s\n", issue.Message)
-		fmt.Printf("Suggestion: %s\n", issue.Suggestion)
+		printf("\n--- %s:%d ---\n", issue.File, issue.Line)
+		printf("Severity: %s\n", issue.Severity)
+		printf("Message: %s\n", issue.Message)
+		printf("Suggestion: %s\n", issue.Suggestion)
 	}
 }
 
-// Close 关闭检查器
+// Close close checker
 func (c *Checker) Close() error {
 	return c.store.Close()
+}
+
+// Helper functions for output
+func printf(format string, args ...interface{}) {
+	fmt.Printf(format, args...)
+}
+
+func print(s string) {
+	fmt.Print(s)
+}
+
+func println(args ...interface{}) {
+	fmt.Println(args...)
 }

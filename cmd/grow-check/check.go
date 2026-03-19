@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/openclaw-coding/grow-check/internal/checker"
+	"github.com/openclaw-coding/grow-check/internal/i18n"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +27,6 @@ The check will:
   4. Show results and offer fixes`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := runCheck(); err != nil {
-			fmt.Fprintf(os.Stderr, "\n❌ Check failed: %v\n", err)
 			os.Exit(1)
 		}
 	},
@@ -37,22 +37,32 @@ func init() {
 }
 
 func runCheck() error {
-	// 查找 skill 路径
+	// Find skill path
 	skillPath, err := findSkillPath()
 	if err != nil {
-		return err
+		// Provide friendly error message
+		println("")
+		print(i18n.Get("check_init_failed"))
+		println("")
+		print(i18n.Get("check_init_hint"))
+		println("")
+		print(i18n.Get("check_init_command"))
+		println("")
+		print(i18n.Get("check_init_more_info"))
+		println("")
+		return fmt.Errorf("grow-check not initialized")
 	}
 
-	// 查找项目根目录
+	// Find project root directory
 	projectRoot := filepath.Dir(filepath.Dir(skillPath))
 
-	// 创建检查器
+	// Create checker
 	check, err := checker.New(skillPath, projectRoot)
 	if err != nil {
 		return fmt.Errorf("failed to create checker: %w", err)
 	}
 	defer check.Close()
 
-	// 运行检查
+	// Run check
 	return check.Run()
 }

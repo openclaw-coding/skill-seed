@@ -7,6 +7,7 @@ import (
 
 	"github.com/openclaw-coding/grow-check/internal/config"
 	"github.com/openclaw-coding/grow-check/internal/git"
+	"github.com/openclaw-coding/grow-check/internal/i18n"
 	"github.com/openclaw-coding/grow-check/internal/storage"
 	"github.com/spf13/cobra"
 )
@@ -25,7 +26,7 @@ This will:
 Run this command in the root directory of your Git repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := initializeSkill(); err != nil {
-			fmt.Fprintf(os.Stderr, "❌ Init failed: %v\n", err)
+			println(i18n.Get("init_failed"), err)
 			os.Exit(1)
 		}
 	},
@@ -36,28 +37,29 @@ func init() {
 }
 
 func initializeSkill() error {
-	// 获取项目根目录
+	// Get project root directory
 	projectRoot, err := os.Getwd()
 	if err != nil {
 		return fmt.Errorf("failed to get current directory: %w", err)
 	}
 
-	// 检查是否是 Git 仓库
+	// Check if it's a Git repository
 	gitOp := git.NewGitOperator(projectRoot)
 	if !gitOp.IsGitRepo() {
 		return fmt.Errorf("not a git repository: %s", projectRoot)
 	}
 
-	// 检查是否已初始化
+	// Check if already initialized
 	skillPath := filepath.Join(projectRoot, ".skills", "grow-check")
 	if _, err := os.Stat(skillPath); err == nil {
 		return fmt.Errorf("grow-check already initialized at %s", skillPath)
 	}
 
-	fmt.Println("📦 Initializing grow-check...")
+	println("📦 Initializing grow-check...")
 
-	// 1. 创建目录结构
-	fmt.Println("  Creating directory structure...")
+	// 1. Create directory structure
+	print(i18n.Get("init_creating_dirs"))
+	println("")
 	dirs := []string{
 		skillPath,
 		filepath.Join(skillPath, "memory"),
@@ -71,8 +73,9 @@ func initializeSkill() error {
 		}
 	}
 
-	// 2. 生成配置
-	fmt.Println("  Generating configuration...")
+	// 2. Generate configuration
+	print(i18n.Get("init_generating_config"))
+	println("")
 	projectName := gitOp.GetProjectName()
 	gitRemote, _ := gitOp.GetRemoteURL()
 
@@ -81,8 +84,9 @@ func initializeSkill() error {
 		return fmt.Errorf("failed to save config: %w", err)
 	}
 
-	// 3. 初始化数据库
-	fmt.Println("  Initializing memory database...")
+	// 3. Initialize database
+	print(i18n.Get("init_initializing_db"))
+	println("")
 	dbPath := filepath.Join(skillPath, "memory", "project.db")
 	store, err := storage.New(dbPath)
 	if err != nil {
@@ -90,61 +94,76 @@ func initializeSkill() error {
 	}
 	store.Close()
 
-	// 4. 安装 Git 钩子
-	fmt.Println("  Installing Git pre-commit hook...")
+	// 4. Install Git hook
+	print(i18n.Get("init_installing_hook"))
+	println("")
 	if err := gitOp.InstallPreCommitHook(skillPath); err != nil {
 		return fmt.Errorf("failed to install hook: %w", err)
 	}
 
-	// 5. 创建 pre-commit 钩子脚本
-	fmt.Println("  Creating hook script...")
+	// 5. Create pre-commit hook script
+	print(i18n.Get("init_creating_hook"))
+	println("")
 	if err := createHookScript(skillPath); err != nil {
 		return fmt.Errorf("failed to create hook script: %w", err)
 	}
 
-	// 6. 创建 README
-	fmt.Println("  Creating README...")
+	// 6. Create README
+	print(i18n.Get("init_creating_readme"))
+	println("")
 	if err := createReadme(skillPath, projectName); err != nil {
 		return fmt.Errorf("failed to create readme: %w", err)
 	}
 
-	fmt.Println("\n✅ grow-check initialized successfully!")
-	fmt.Printf("\n📁 Skill location: %s\n", skillPath)
-	fmt.Println("\nNext steps:")
-	fmt.Println("  1. Learn from history: grow-check learn --since=30d")
-	fmt.Println("  2. Make commits and watch it learn!")
-	fmt.Println("  3. View patterns: grow-check patterns")
-	fmt.Println("  4. View rules: grow-check rules")
+	println("")
+	print(i18n.Get("init_success"))
+	println("")
+	printf(i18n.Get("init_skill_location"), skillPath)
+	println("")
+	println("")
+	print(i18n.Get("init_next_steps"))
+	println("")
+	print(i18n.Get("init_step_learn"))
+	println("")
+	print(i18n.Get("init_step_watch"))
+	println("")
+	print(i18n.Get("init_step_patterns"))
+	println("")
+	print(i18n.Get("init_step_rules"))
+	println("")
 
 	return nil
 }
 
 func createHookScript(skillPath string) error {
 	hookPath := filepath.Join(skillPath, "hooks", "pre-commit")
-	
-	// 获取二进制文件路径
-	binPath := filepath.Join(skillPath, "bin", "grow-check")
 
-	content := fmt.Sprintf(`#!/bin/sh
+	content := `#!/bin/sh
 # grow-check pre-commit hook
 # This hook learns from your commits and checks code quality
 
-# Check if grow-check is initialized
-if [ ! -d "%s" ]; then
-    echo "grow-check not initialized, skipping..."
-    exit 0
-fi
-
-# Run the check
-%s check
+# Run the check (assumes grow-check is in PATH)
+grow-check check
 exit $?
-`, skillPath, binPath)
+`
 
 	if err := os.WriteFile(hookPath, []byte(content), 0755); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func printf(format string, args ...interface{}) {
+	fmt.Printf(format, args...)
+}
+
+func print(s string) {
+	fmt.Print(s)
+}
+
+func println(args ...interface{}) {
+	fmt.Println(args...)
 }
 
 func createReadme(skillPath, projectName string) error {

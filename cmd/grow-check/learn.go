@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/openclaw-coding/grow-check/internal/i18n"
 	"github.com/openclaw-coding/grow-check/internal/learner"
 	"github.com/spf13/cobra"
 )
@@ -36,7 +37,7 @@ Examples:
   grow-check learn --max=100`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := learnFromHistory(); err != nil {
-			fmt.Fprintf(os.Stderr, "❌ Learn failed: %v\n", err)
+			println(i18n.Get("learn_failed"), err)
 			os.Exit(1)
 		}
 	},
@@ -49,22 +50,23 @@ func init() {
 }
 
 func learnFromHistory() error {
-	// 查找 skill 路径
+	// Find skill path
 	skillPath, err := findSkillPath()
 	if err != nil {
 		return err
 	}
 
-	// 创建学习器
+	// Create learner
 	learn, err := learner.New(skillPath)
 	if err != nil {
 		return fmt.Errorf("failed to create learner: %w", err)
 	}
 	defer learn.Close()
 
-	// 执行学习
-	fmt.Printf("🤖 Learning from Git history (last %d days)...\n\n", sinceDays)
-	
+	// Execute learning
+	printf(i18n.Get("learn_from_history"), sinceDays)
+	println("")
+
 	if err := learn.LearnFromHistory(sinceDays, maxCommits); err != nil {
 		return err
 	}
