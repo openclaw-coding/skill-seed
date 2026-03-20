@@ -20,7 +20,7 @@ other = "skill-seed 初始化成功"
 other = "初始化失败: {{.Error}}"
 
 [InitSkillLocation]
-other = "Skill 位置: {{.Path}}"
+other = "Skill Seed 位置: {{.Path}}"
 
 [InitNextSteps]
 other = "后续步骤:"

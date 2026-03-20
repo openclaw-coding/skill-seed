@@ -20,7 +20,7 @@ other = "skill-seed initialized successfully"
 other = "Initialization failed: {{.Error}}"
 
 [InitSkillLocation]
-other = "Skill location: {{.Path}}"
+other = "Skill Seed location: {{.Path}}"
 
 [InitNextSteps]
 other = "Next steps:"
