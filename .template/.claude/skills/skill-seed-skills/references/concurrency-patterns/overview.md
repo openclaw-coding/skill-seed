@@ -1,0 +1,51 @@
+# Concurrency Patterns Overview
+
+**Category**: Concurrency
+**Confidence**: {{CONFIDENCE}}%
+**Last Updated**: {{TIMESTAMP}}
+**Total Examples**: {{EXAMPLE_COUNT}}
+
+## Summary
+
+This section captures all concurrent programming patterns used in the project.
+
+## Pattern Types
+
+### Goroutine Usage
+**Details**: [goroutine-usage.md](goroutine-usage.md)
+- When to use goroutines
+- Goroutine lifecycle management
+- Common goroutine patterns
+
+### Channel Patterns
+**Details**: [channel-patterns.md](channel-patterns.md)
+- Channel creation and usage
+- Channel types and directions
+- Common channel patterns
+
+### Synchronization
+**Details**: [synchronization.md](synchronization.md)
+- Mutex usage
+- WaitGroup patterns
+- Once and atomic operations
+
+### Context Usage
+**Details**: [context-usage.md](context-usage.md)
+- Context propagation
+- Cancellation patterns
+- Timeout handling
+
+## Quick Reference
+
+| Pattern | Usage | Confidence |
+|---------|-------|------------|
+{{CONCURRENCY_QUICK_REFERENCE}}
+
+## Statistics
+
+- **Total patterns learned**: {{TOTAL_PATTERNS}}
+- **Consistency rate**: {{CONSISTENCY_RATE}}%
+
+---
+
+**Auto-generated from {{COMMITS_ANALYZED}} commits**
