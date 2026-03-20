@@ -11,10 +11,10 @@ other = "一个从 Git 历史中学习的项目级技能，\n帮助 AI 助手更
 other = "在当前项目中初始化 skill-seed。\n\n此命令将：\n  • 创建 .skill-seed/ 目录\n  • 生成默认配置文件 (config.yaml)\n  • 初始化 BoltDB 数据库\n  • 准备 Claude Code skills 模板\n\n请在 Git 仓库根目录运行此命令。\n\n示例：\n  # 在当前项目初始化\n  skill-seed init\n\n  # 强制重新初始化\n  skill-seed init --force"
 
 [InitStart]
-other = "初始化 skill-seed"
+other = "初始化 Skill Seed"
 
 [InitSuccess]
-other = "skill-seed 初始化成功"
+other = "初始化成功"
 
 [InitFailed]
 other = "初始化失败: {{.Error}}"

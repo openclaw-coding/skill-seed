@@ -11,10 +11,10 @@ other = "A project-level skill that learns from Git history\nto help AI agents u
 other = "Initialize skill-seed in your project.\n\nThis command will:\n  • Create .skill-seed/ directory\n  • Generate default configuration (config.yaml)\n  • Initialize BoltDB database\n  • Prepare Claude Code skills template\n\nPlease run this command in the root directory of a Git repository.\n\nExamples:\n  # Initialize in current project\n  skill-seed init\n\n  # Force re-initialization\n  skill-seed init --force"
 
 [InitStart]
-other = "Initialize skill-seed"
+other = "Initialize Skill Seed"
 
 [InitSuccess]
-other = "skill-seed initialized successfully"
+other = "initialized successfully"
 
 [InitFailed]
 other = "Initialization failed: {{.Error}}"
