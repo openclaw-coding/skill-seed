@@ -1,6 +1,12 @@
 [InitShort]
 other = "初始化 skill-seed 项目"
 
+[RootShort]
+other = "为 AI 助手培育项目技能"
+
+[RootLong]
+other = "一个从 Git 历史中学习的项目级技能，\n帮助 AI 助手更好地理解你的代码库。\n\n此工具集成了 Claude 进行深度代码分析，\n并自动学习你团队的编码模式。"
+
 [InitLongDesc]
 other = "在当前项目中初始化 skill-seed。\n\n此命令将：\n  • 创建 .skill-seed/ 目录\n  • 生成默认配置文件 (config.yaml)\n  • 初始化 BoltDB 数据库\n  • 准备 Claude Code skills 模板\n\n请在 Git 仓库根目录运行此命令。\n\n示例：\n  # 在当前项目初始化\n  skill-seed init\n\n  # 强制重新初始化\n  skill-seed init --force"
 
@@ -51,15 +57,6 @@ other = "检查暂存的文件"
 
 [CheckLongDesc]
 other = "检查暂存的文件是否符合编码规范。\n\n此命令将：\n  • 获取 Git 暂存的文件\n  • 使用 Claude AI 分析代码\n  • 基于学到的模式发现问题\n  • 提供修复建议\n\n通常通过 Git pre-commit hook 自动运行。\n\n示例：\n  # 检查暂存的文件\n  skill-seed check\n\n  # 检查所有文件\n  skill-seed check --all"
-
-[CheckCheckingFiles]
-other = "正在检查 {{.Count}} 个文件..."
-
-[CheckNoIssues]
-other = "未发现问题"
-
-[CheckFoundIssues]
-other = "发现 {{.Count}} 个问题:"
 
 [GenerateShort]
 other = "生成 Claude Code skills"
@@ -123,3 +120,143 @@ other = "找到 {{.Count}} 个文件"
 
 [ScanCompleted]
 other = "项目扫描完成"
+
+# View patterns
+[ViewPatternsShort]
+other = "查看所有学到的模式"
+
+[ViewPatternsLong]
+other = "查看从 Git 历史中学到的所有模式。"
+
+[ViewNoPatterns]
+other = "还没有学习到任何模式。"
+
+[ViewPatternsTotal]
+other = "学到的模式 (共 {{.Count}} 个):"
+
+[ViewPatternConfidence]
+other = "   置信度: {{.Confidence}} | 频率: {{.Frequency}}"
+
+[ViewPatternDescription]
+other = "   描述: {{.Description}}"
+
+# View rules
+[ViewRulesShort]
+other = "查看所有生成的规则"
+
+[ViewRulesLong]
+other = "查看从模式生成的所有规则。"
+
+[ViewNoRules]
+other = "还没有生成任何规则。"
+
+[ViewRulesTotal]
+other = "生成的规则 (共 {{.Count}} 个):"
+
+[ViewRuleDescription]
+other = "   描述: {{.Description}}"
+
+[ViewRulePatterns]
+other = "   模式: {{.Count}}"
+
+[ViewFailed]
+other = "失败: {{.Error}}"
+
+# Analyze
+[AnalyzeNoFiles]
+other = "错误: 没有提供文件"
+
+[AnalyzeGetRootFailed]
+other = "获取项目根目录失败: {{.Error}}"
+
+[AnalyzeAnalyzing]
+other = "正在分析 {{.Count}} 个文件..."
+
+[AnalyzeFile]
+other = "  - {{.File}}"
+
+# Hook
+[HookBothFlagsError]
+other = "错误: 不能同时使用 --install 和 --uninstall"
+
+[HookInstallFailed]
+other = "Hook 安装失败: {{.Error}}"
+
+[HookUninstallFailed]
+other = "Hook 卸载失败: {{.Error}}"
+
+[HookRunFailed]
+other = "Hook 运行失败: {{.Error}}"
+
+[HookNoStagedFiles]
+other = "没有暂存的文件需要检查"
+
+[HookCheckingFiles]
+other = "正在检查 {{.Count}} 个文件..."
+
+[HookCheckPassed]
+other = "检查通过"
+
+# Scan
+[ScanProjectRoot]
+other = "  项目根目录: {{.Path}}"
+
+# Learn
+[LearnStarting]
+other = "开始从 Git 历史学习..."
+
+[LearnAnalyzingCommitsCount]
+other = "分析最多 {{.Count}} 个提交"
+
+[LearnFailed]
+other = "学习失败: {{.Error}}"
+
+[LearnCompleted]
+other = "✓ 学习完成！"
+
+[LearnTotalPatterns]
+other = "总共学习的模式数: {{.Count}}"
+
+# Generate
+[GenerateStarting]
+other = "生成 Claude Code skills..."
+
+[GenerateCountFailed]
+other = "统计模式失败: {{.Error}}"
+
+[GenerateNoPatterns]
+other = "还没有学习任何模式。请先运行 'skill-seed learn'。"
+
+[GenerateFoundPatterns]
+other = "找到 {{.Count}} 个模式"
+
+[GenerateFailed]
+other = "生成 skills 失败: {{.Error}}"
+
+[GenerateSuccessMsg]
+other = "✓ Skills 生成成功！"
+
+[GenerateOutputPath]
+other = "输出路径: {{.Path}}"
+
+# Check
+[CheckStarting]
+other = "检查代码质量..."
+
+[CheckAllFiles]
+other = "检查所有文件..."
+
+[CheckStagedFiles]
+other = "检查暂存的文件..."
+
+[CheckFailed]
+other = "检查失败: {{.Error}}"
+
+[CheckNoIssues]
+other = "✓ 未发现问题！"
+
+[CheckFoundIssues]
+other = "发现 {{.Count}} 个问题:"
+
+[CheckSuggestion]
+other = "   建议: {{.Suggestion}}"

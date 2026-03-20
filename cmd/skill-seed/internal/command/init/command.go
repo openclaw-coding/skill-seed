@@ -41,8 +41,8 @@ func initializeSkill() error {
 	}
 
 	// 检查是否已经初始化
-	skillPath := filepath.Join(projectRoot, ".skill-seed")
-	if _, err := os.Stat(skillPath); err == nil {
+	seedPath := filepath.Join(projectRoot, ".skill-seed")
+	if _, err := os.Stat(seedPath); err == nil {
 		return fmt.Errorf("skill-seed already initialized")
 	}
 
@@ -50,8 +50,8 @@ func initializeSkill() error {
 
 	// 1. 创建目录结构
 	dirs := []string{
-		skillPath,
-		filepath.Join(skillPath, "memory"),
+		seedPath,
+		filepath.Join(seedPath, "memory"),
 	}
 
 	for _, dir := range dirs {
@@ -61,7 +61,7 @@ func initializeSkill() error {
 	}
 
 	// 2. 生成配置
-	configRepo, err := config.NewRepository(skillPath)
+	configRepo, err := config.NewRepository(seedPath)
 	if err != nil {
 		return fmt.Errorf("failed to create config: %w", err)
 	}
@@ -71,7 +71,7 @@ func initializeSkill() error {
 	_ = configRepo.SetProjectName(projectName)
 
 	// 3. 初始化数据库
-	dbPath := filepath.Join(skillPath, "memory", "project.db")
+	dbPath := filepath.Join(seedPath, "memory", "project.db")
 	patternRepo, err := boltdb.NewPatternRepository(dbPath)
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
@@ -79,7 +79,7 @@ func initializeSkill() error {
 	_ = patternRepo.Close()
 
 	fmt.Println(i18n.Get("InitSuccess"))
-	fmt.Println(i18n.GetWithParams("InitSkillLocation", map[string]interface{}{"Path": skillPath}))
+	fmt.Println(i18n.GetWithParams("InitSkillLocation", map[string]interface{}{"Path": seedPath}))
 	fmt.Println(i18n.Get("InitNextSteps"))
 	fmt.Println(i18n.Get("InitStepLearn"))
 	fmt.Println(i18n.Get("InitStepWatch"))

@@ -45,22 +45,22 @@ func runLearn(cont *container.Container, cmd *cobra.Command) error {
 		limit = 1000 // 设置一个较大的值
 	}
 
-	output.Info("Starting to learn from Git history...")
-	output.Dim("Analyzing up to %d commits\n", limit)
+	output.Info("%s", i18n.Get("LearnStarting"))
+	output.Dim("%s", i18n.GetWithParams("LearnAnalyzingCommitsCount", map[string]interface{}{"Count": limit})+"\n")
 
 	// 调用学习服务
 	err := cont.LearnerSvc.Learn(ctx, limit)
 	if err != nil {
-		output.Error("Failed to learn: %v", err)
+		output.Error("%s", i18n.GetWithParams("LearnFailed", map[string]interface{}{"Error": err.Error()}))
 		return err
 	}
 
-	output.Success("✓ Learning completed!")
+	output.Success("%s", i18n.Get("LearnCompleted"))
 
 	// 显示统计信息
 	count, err := cont.PatternRepo.Count(ctx)
 	if err == nil {
-		output.Info("Total patterns learned: %d", count)
+		output.Info("%s", i18n.GetWithParams("LearnTotalPatterns", map[string]interface{}{"Count": count}))
 	}
 
 	return nil

@@ -19,7 +19,7 @@ func Cmd(cont *container.Container) *cobra.Command {
 		Long:  i18n.Get("AnalyzeLongDesc"),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				fmt.Fprintln(os.Stderr, "Error: no files provided")
+				fmt.Fprintln(os.Stderr, i18n.Get("AnalyzeNoFiles"))
 				os.Exit(1)
 			}
 			if err := analyzeFiles(cont, args); err != nil {
@@ -38,7 +38,7 @@ func analyzeFiles(cont *container.Container, files []string) error {
 	// 获取项目根目录
 	projectRoot, err := cont.GetGitRepository().GetProjectRoot(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to get project root: %w", err)
+		return fmt.Errorf("%s", i18n.GetWithParams("AnalyzeGetRootFailed", map[string]interface{}{"Error": err.Error()}))
 	}
 
 	// 转换为绝对路径
@@ -52,9 +52,9 @@ func analyzeFiles(cont *container.Container, files []string) error {
 		}
 	}
 
-	fmt.Printf("Analyzing %d files...\n", len(files))
+	fmt.Println(i18n.GetWithParams("AnalyzeAnalyzing", map[string]interface{}{"Count": len(files)}))
 	for _, file := range files {
-		fmt.Printf("  - %s\n", file)
+		fmt.Println(i18n.GetWithParams("AnalyzeFile", map[string]interface{}{"File": file}))
 	}
 	fmt.Println("")
 

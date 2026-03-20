@@ -36,30 +36,30 @@ func Cmd(cont *container.Container) *cobra.Command {
 func runGenerate(cont *container.Container, cmd *cobra.Command) error {
 	ctx := context.Background()
 
-	output.Info("Generating Claude Code skills...")
+	output.Info("%s", i18n.Get("GenerateStarting"))
 
 	// 获取模式数量
 	count, err := cont.PatternRepo.Count(ctx)
 	if err != nil {
-		output.Error("Failed to count patterns: %v", err)
+		output.Error("%s", i18n.GetWithParams("GenerateCountFailed", map[string]interface{}{"Error": err.Error()}))
 		return err
 	}
 
 	if count == 0 {
-		output.Warning("No patterns learned yet. Run 'skill-seed learn' first.")
+		output.Warning("%s", i18n.Get("GenerateNoPatterns"))
 		return nil
 	}
 
-	output.Dim("Found %d patterns\n", count)
+	output.Dim("%s", i18n.GetWithParams("GenerateFoundPatterns", map[string]interface{}{"Count": count})+"\n")
 
 	// 生成 Skills
 	if err := cont.GeneratorSvc.GenerateSkills(ctx, outputPath); err != nil {
-		output.Error("Failed to generate skills: %v", err)
+		output.Error("%s", i18n.GetWithParams("GenerateFailed", map[string]interface{}{"Error": err.Error()}))
 		return err
 	}
 
-	output.Success("✓ Skills generated successfully!")
-	output.Info("Output: %s", outputPath)
+	output.Success("%s", i18n.Get("GenerateSuccessMsg"))
+	output.Info("%s", i18n.GetWithParams("GenerateOutputPath", map[string]interface{}{"Path": outputPath}))
 
 	return nil
 }

@@ -1,6 +1,12 @@
 [InitShort]
 other = "Initialize skill-seed project"
 
+[RootShort]
+other = "Growing project skills for AI agents"
+
+[RootLong]
+other = "A project-level skill that learns from Git history\nto help AI agents understand your codebase better.\n\nThis tool integrates with Claude for deep code analysis\nand learns your team's coding patterns automatically."
+
 [InitLongDesc]
 other = "Initialize skill-seed in your project.\n\nThis command will:\n  • Create .skill-seed/ directory\n  • Generate default configuration (config.yaml)\n  • Initialize BoltDB database\n  • Prepare Claude Code skills template\n\nPlease run this command in the root directory of a Git repository.\n\nExamples:\n  # Initialize in current project\n  skill-seed init\n\n  # Force re-initialization\n  skill-seed init --force"
 
@@ -51,15 +57,6 @@ other = "Check staged files"
 
 [CheckLongDesc]
 other = "Check if staged files comply with coding standards.\n\nThis command will:\n  • Get Git staged files\n  • Analyze code using Claude AI\n  • Find issues based on learned patterns\n  • Provide fix suggestions\n\nUsually runs automatically via Git pre-commit hook.\n\nExamples:\n  # Check staged files\n  skill-seed check\n\n  # Check all files\n  skill-seed check --all"
-
-[CheckCheckingFiles]
-other = "Checking {{.Count}} files..."
-
-[CheckNoIssues]
-other = "No issues found"
-
-[CheckFoundIssues]
-other = "Found {{.Count}} issues:"
 
 [GenerateShort]
 other = "Generate Claude Code skills"
@@ -123,3 +120,143 @@ other = "Found {{.Count}} files"
 
 [ScanCompleted]
 other = "Project scan completed"
+
+# View patterns
+[ViewPatternsShort]
+other = "View all learned patterns"
+
+[ViewPatternsLong]
+other = "View all learned patterns from Git history."
+
+[ViewNoPatterns]
+other = "No patterns learned yet."
+
+[ViewPatternsTotal]
+other = "Learned patterns ({{.Count}} total):"
+
+[ViewPatternConfidence]
+other = "   Confidence: {{.Confidence}} | Frequency: {{.Frequency}}"
+
+[ViewPatternDescription]
+other = "   Description: {{.Description}}"
+
+# View rules
+[ViewRulesShort]
+other = "View all generated rules"
+
+[ViewRulesLong]
+other = "View all generated rules from patterns."
+
+[ViewNoRules]
+other = "No rules generated yet."
+
+[ViewRulesTotal]
+other = "Generated rules ({{.Count}} total):"
+
+[ViewRuleDescription]
+other = "   Description: {{.Description}}"
+
+[ViewRulePatterns]
+other = "   Patterns: {{.Count}}"
+
+[ViewFailed]
+other = "Failed: {{.Error}}"
+
+# Analyze
+[AnalyzeNoFiles]
+other = "Error: no files provided"
+
+[AnalyzeGetRootFailed]
+other = "failed to get project root: {{.Error}}"
+
+[AnalyzeAnalyzing]
+other = "Analyzing {{.Count}} files..."
+
+[AnalyzeFile]
+other = "  - {{.File}}"
+
+# Hook
+[HookBothFlagsError]
+other = "Error: cannot use both --install and --uninstall"
+
+[HookInstallFailed]
+other = "Hook install failed: {{.Error}}"
+
+[HookUninstallFailed]
+other = "Hook uninstall failed: {{.Error}}"
+
+[HookRunFailed]
+other = "Hook run failed: {{.Error}}"
+
+[HookNoStagedFiles]
+other = "No staged files to check"
+
+[HookCheckingFiles]
+other = "Checking {{.Count}} files..."
+
+[HookCheckPassed]
+other = "Check passed"
+
+# Scan
+[ScanProjectRoot]
+other = "  Project root: {{.Path}}"
+
+# Learn
+[LearnStarting]
+other = "Starting to learn from Git history..."
+
+[LearnAnalyzingCommitsCount]
+other = "Analyzing up to {{.Count}} commits"
+
+[LearnFailed]
+other = "Failed to learn: {{.Error}}"
+
+[LearnCompleted]
+other = "✓ Learning completed!"
+
+[LearnTotalPatterns]
+other = "Total patterns learned: {{.Count}}"
+
+# Generate
+[GenerateStarting]
+other = "Generating Claude Code skills..."
+
+[GenerateCountFailed]
+other = "Failed to count patterns: {{.Error}}"
+
+[GenerateNoPatterns]
+other = "No patterns learned yet. Run 'skill-seed learn' first."
+
+[GenerateFoundPatterns]
+other = "Found {{.Count}} patterns"
+
+[GenerateFailed]
+other = "Failed to generate skills: {{.Error}}"
+
+[GenerateSuccessMsg]
+other = "✓ Skills generated successfully!"
+
+[GenerateOutputPath]
+other = "Output: {{.Path}}"
+
+# Check
+[CheckStarting]
+other = "Checking code quality..."
+
+[CheckAllFiles]
+other = "Checking all files..."
+
+[CheckStagedFiles]
+other = "Checking staged files..."
+
+[CheckFailed]
+other = "Failed to check: {{.Error}}"
+
+[CheckNoIssues]
+other = "✓ No issues found!"
+
+[CheckFoundIssues]
+other = "Found {{.Count}} issues:"
+
+[CheckSuggestion]
+other = "   Suggestion: {{.Suggestion}}"

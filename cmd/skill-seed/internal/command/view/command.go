@@ -27,11 +27,11 @@ func Cmd(cont *container.Container) *cobra.Command {
 func patternsCmd(cont *container.Container) *cobra.Command {
 	return &cobra.Command{
 		Use:   "patterns",
-		Short: "View all learned patterns",
-		Long:  "View all learned patterns from Git history.",
+		Short: i18n.Get("ViewPatternsShort"),
+		Long:  i18n.Get("ViewPatternsLong"),
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := listPatterns(cont); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed: %v\n", err)
+				fmt.Fprintf(os.Stderr, "%s", i18n.GetWithParams("ViewFailed", map[string]interface{}{"Error": err.Error()}))
 				os.Exit(1)
 			}
 		},
@@ -41,11 +41,11 @@ func patternsCmd(cont *container.Container) *cobra.Command {
 func rulesCmd(cont *container.Container) *cobra.Command {
 	return &cobra.Command{
 		Use:   "rules",
-		Short: "View all generated rules",
-		Long:  "View all generated rules from patterns.",
+		Short: i18n.Get("ViewRulesShort"),
+		Long:  i18n.Get("ViewRulesLong"),
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := listRules(cont); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed: %v\n", err)
+				fmt.Fprintf(os.Stderr, "%s", i18n.GetWithParams("ViewFailed", map[string]interface{}{"Error": err.Error()}))
 				os.Exit(1)
 			}
 		},
@@ -61,16 +61,20 @@ func listPatterns(cont *container.Container) error {
 	}
 
 	if len(patterns) == 0 {
-		fmt.Println("No patterns learned yet.")
+		fmt.Println(i18n.Get("ViewNoPatterns"))
 		return nil
 	}
 
-	fmt.Printf("Learned patterns (%d total):\n\n", len(patterns))
+	fmt.Println(i18n.GetWithParams("ViewPatternsTotal", map[string]interface{}{"Count": len(patterns)}))
+	fmt.Println()
 	for i, p := range patterns {
 		fmt.Printf("%d. [%s] %s\n", i+1, p.Category, p.Name)
-		fmt.Printf("   Confidence: %.2f | Frequency: %d\n", p.Confidence, p.Frequency)
+		fmt.Println(i18n.GetWithParams("ViewPatternConfidence", map[string]interface{}{
+			"Confidence": fmt.Sprintf("%.2f", p.Confidence),
+			"Frequency":  p.Frequency,
+		}))
 		if p.Description != "" {
-			fmt.Printf("   Description: %s\n", p.Description)
+			fmt.Println(i18n.GetWithParams("ViewPatternDescription", map[string]interface{}{"Description": p.Description}))
 		}
 		fmt.Println()
 	}
@@ -87,17 +91,18 @@ func listRules(cont *container.Container) error {
 	}
 
 	if len(rules) == 0 {
-		fmt.Println("No rules generated yet.")
+		fmt.Println(i18n.Get("ViewNoRules"))
 		return nil
 	}
 
-	fmt.Printf("Generated rules (%d total):\n\n", len(rules))
+	fmt.Println(i18n.GetWithParams("ViewRulesTotal", map[string]interface{}{"Count": len(rules)}))
+	fmt.Println()
 	for i, r := range rules {
 		fmt.Printf("%d. %s [%s]\n", i+1, r.Name, r.Category)
 		if r.Description != "" {
-			fmt.Printf("   Description: %s\n", r.Description)
+			fmt.Println(i18n.GetWithParams("ViewRuleDescription", map[string]interface{}{"Description": r.Description}))
 		}
-		fmt.Printf("   Patterns: %d\n", len(r.PatternIDs))
+		fmt.Println(i18n.GetWithParams("ViewRulePatterns", map[string]interface{}{"Count": len(r.PatternIDs)}))
 		fmt.Println()
 	}
 

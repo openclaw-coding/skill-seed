@@ -3,7 +3,6 @@ package container
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -36,9 +35,9 @@ type Container struct {
 }
 
 // NewContainer 创建应用容器
-func NewContainer(ctx context.Context, skillPath string) (*Container, error) {
+func NewContainer(ctx context.Context, seedPath string) (*Container, error) {
 	// 1. 加载配置
-	configRepo, err := config.NewRepository(skillPath)
+	configRepo, err := config.NewRepository(seedPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load config: %w", err)
 	}
@@ -54,11 +53,11 @@ func NewContainer(ctx context.Context, skillPath string) (*Container, error) {
 	}
 
 	// 3. 创建 Git 仓储
-	projectRoot := filepath.Dir(filepath.Dir(skillPath))
+	projectRoot := filepath.Dir(filepath.Dir(seedPath))
 	gitRepo := git.NewRepository(projectRoot)
 
 	// 4. 创建 BoltDB 仓储
-	dbPath := filepath.Join(skillPath, "memory", "project.db")
+	dbPath := filepath.Join(seedPath, "memory", "project.db")
 	patternRepo, err := boltdb.NewPatternRepository(dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pattern repository: %w", err)
@@ -103,30 +102,6 @@ func (c *Container) Close() error {
 		return c.PatternRepo.Close()
 	}
 	return nil
-}
-
-// GetSkillPath 获取 skill 路径
-func GetSkillPath() (string, error) {
-	// 从当前目录向上查找 .skill-seed 目录
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-
-	for {
-		skillPath := filepath.Join(dir, ".skill-seed")
-		if _, err := os.Stat(skillPath); err == nil {
-			return skillPath, nil
-		}
-
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-
-	return "", fmt.Errorf(".skill-seed directory not found")
 }
 
 // GetGitRepository 获取 Git 仓储

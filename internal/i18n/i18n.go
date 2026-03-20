@@ -44,7 +44,11 @@ func Init(lang string) error {
 // Get 获取翻译
 func Get(key string) string {
 	if localizer == nil {
-		_ = Init("zh-CN")
+		if err := Init("zh-CN"); err != nil {
+			// 初始化失败，创建一个空的 localizer 作为 fallback
+			bundle = i18n.NewBundle(language.English)
+			localizer = i18n.NewLocalizer(bundle, "en")
+		}
 	}
 
 	msg, err := localizer.Localize(&i18n.LocalizeConfig{
@@ -59,7 +63,11 @@ func Get(key string) string {
 // GetWithParams 获取带参数的翻译
 func GetWithParams(key string, params map[string]interface{}) string {
 	if localizer == nil {
-		_ = Init("zh-CN")
+		if err := Init("zh-CN"); err != nil {
+			// 初始化失败，创建一个空的 localizer 作为 fallback
+			bundle = i18n.NewBundle(language.English)
+			localizer = i18n.NewLocalizer(bundle, "en")
+		}
 	}
 
 	msg, err := localizer.Localize(&i18n.LocalizeConfig{

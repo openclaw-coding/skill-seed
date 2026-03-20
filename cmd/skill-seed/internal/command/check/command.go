@@ -38,32 +38,32 @@ func Cmd(cont *container.Container) *cobra.Command {
 func runCheck(cont *container.Container, cmd *cobra.Command) error {
 	ctx := context.Background()
 
-	output.Info("Checking code quality...")
+	output.Info("%s", i18n.Get("CheckStarting"))
 
 	var issues []domain.Issue
 	var err error
 
 	// 检查所有文件还是只检查暂存文件
 	if checkAll {
-		output.Dim("Checking all files...\n")
+		output.Dim("%s", i18n.Get("CheckAllFiles")+"\n")
 		issues, err = cont.CheckerSvc.CheckAll(ctx)
 	} else {
-		output.Dim("Checking staged files...\n")
+		output.Dim("%s", i18n.Get("CheckStagedFiles")+"\n")
 		issues, err = cont.CheckerSvc.Check(ctx)
 	}
 
 	if err != nil {
-		output.Error("Failed to check: %v", err)
+		output.Error("%s", i18n.GetWithParams("CheckFailed", map[string]interface{}{"Error": err.Error()}))
 		return err
 	}
 
 	// 显示检查结果
 	if len(issues) == 0 {
-		output.Success("✓ No issues found!")
+		output.Success("%s", i18n.Get("CheckNoIssues"))
 		return nil
 	}
 
-	output.Warning("Found %d issues:\n", len(issues))
+	output.Warning("%s", i18n.GetWithParams("CheckFoundIssues", map[string]interface{}{"Count": len(issues)})+"\n")
 	for i, iss := range issues {
 		output.Print("\n%d. ", i+1)
 		output.Print("%s ", output.SeverityLabel(string(iss.Severity)))
@@ -71,7 +71,7 @@ func runCheck(cont *container.Container, cmd *cobra.Command) error {
 		output.Println("   %s", iss.Message)
 
 		if iss.Suggestion != "" {
-			output.Dim("   Suggestion: %s\n", iss.Suggestion)
+			output.Dim("%s", i18n.GetWithParams("CheckSuggestion", map[string]interface{}{"Suggestion": iss.Suggestion})+"\n")
 		}
 	}
 

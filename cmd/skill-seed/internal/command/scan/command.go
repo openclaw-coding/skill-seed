@@ -41,7 +41,8 @@ func runScan(cont *container.Container, cmd *cobra.Command) error {
 	}
 
 	fmt.Println(i18n.Get("ScanAnalyzingProject"))
-	fmt.Printf("  Project root: %s\n\n", projectRoot)
+	fmt.Println(i18n.GetWithParams("ScanProjectRoot", map[string]interface{}{"Path": projectRoot}))
+	fmt.Println()
 
 	// 获取所有文件
 	var files []string

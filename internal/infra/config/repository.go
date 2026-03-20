@@ -69,8 +69,8 @@ type Repository struct {
 }
 
 // NewRepository 创建配置仓储
-func NewRepository(skillPath string) (*Repository, error) {
-	configPath := filepath.Join(skillPath, "config.yaml")
+func NewRepository(seedPath string) (*Repository, error) {
+	configPath := filepath.Join(seedPath, "config.yaml")
 
 	repo := &Repository{
 		configPath: configPath,
