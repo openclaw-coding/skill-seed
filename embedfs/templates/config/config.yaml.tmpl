@@ -1,0 +1,44 @@
+# skill-seed 配置文件
+# 这是 skill-seed 工具的工作配置
+
+# 项目信息
+project:
+  name: ""                   # 项目名称（自动填充）
+  language: "go"             # 项目语言
+  locale: "zh-CN"            # CLI 输出语言：zh-CN（中文）或 en-US（英文）
+  git_remote: ""             # Git 远程地址（自动填充）
+  root_path: ""              # 项目根路径（自动填充）
+  initialized_at: ""         # 初始化时间（自动填充）
+
+# Claude AI 集成配置
+claude:
+  enabled: true              # 是否启用 Claude 分析
+  timeout_seconds: 60        # Claude 分析超时时间（秒）
+  fallback_to_basic: true    # Claude 不可用时降级到基础检查
+
+# Agent 配置
+agent:
+  type: "claude"             # Agent 类型：claude, gpt, local
+  command: "claude"          # Claude 命令路径
+  timeout: 60                # 超时时间（秒）
+
+# 学习配置
+learning:
+  max_commits: 50            # 默认分析的提交数量
+  min_samples_for_rule: 3    # 生成规则所需最小样本数
+
+# 检查配置
+checking:
+  exclude_patterns:          # 排除的文件模式（不进行检查和分析）
+    - "vendor/*"             # 依赖目录
+    - "node_modules/*"       # Node.js 依赖
+    - "*.pb.go"              # Protobuf 生成文件
+    - "*.gen.go"             # 代码生成文件
+    - "*/mocks/*"            # Mock 文件
+    - "**/testdata/*"        # 测试数据
+    - "**/test/*"            # 测试目录
+
+# 输出配置
+output:
+  skills_path: "~/.claude/skills/skill-seed-skills"  # 生成的 Skills 输出路径
+  default_language: "go"    # 默认分析的语言

@@ -1,0 +1,77 @@
+You are a senior code review expert. Please analyze the following code changes:
+
+## Project Context
+- Name: {{.Context.Name}}
+- Language: {{.Context.Language}}
+{{- if .Context.Frameworks}}
+- Frameworks: {{range .Context.Frameworks}}{{.}}, {{end}}
+{{- end}}
+{{- if .Context.Dependencies}}
+- Dependencies: {{range .Context.Dependencies}}{{.}}, {{end}}
+{{- end}}
+
+## Known Patterns ({{len .Patterns}} patterns)
+{{range .Patterns}}
+### {{.Name}} ({{.Category}})
+- Description: {{.Description}}
+- Rule: {{.Rule}}
+{{- if .GoodExample}}
+- Good Example:
+```
+{{.GoodExample}}
+```
+{{- end}}
+{{- if .BadExample}}
+- Bad Example:
+```
+{{.BadExample}}
+```
+{{- end}}
+{{end}}
+
+## Changed Files ({{len .Files}} files)
+{{range .Files}}
+### File: {{.Path}} ({{.Status}})
+Language: {{.Language}}
+{{if .Content}}
+```{{.Language}}
+{{.Content}}
+```
+{{else}}
+(No content available)
+{{end}}
+{{end}}
+
+## Recent Commits
+{{range .RecentCommits}}
+- {{.Hash}}: {{.Message}} ({{.Author}}, {{.Date.Format "2006-01-02"}})
+{{end}}
+
+## Analysis Requirements
+Please analyze the code changes and identify:
+1. **Potential Issues**: Bugs, logic errors, security vulnerabilities
+2. **Pattern Violations**: Code that doesn't follow the known patterns
+3. **Regression Risks**: Changes that might break existing functionality
+4. **Improvements**: Suggestions for better code quality
+
+## Output Format
+Return a valid JSON object (no markdown, no code blocks):
+{
+  "issues": [
+    {
+      "file": "path/to/file.go",
+      "line": 42,
+      "severity": "warning",
+      "message": "Issue description",
+      "suggestion": "How to fix it",
+      "pattern_id": "pattern-id-if-related"
+    }
+  ],
+  "suggestions": [
+    "General improvement suggestion 1",
+    "General improvement suggestion 2"
+  ],
+  "confidence": 0.85
+}
+
+**Important**: Return ONLY the JSON object, no other text.

@@ -1,0 +1,58 @@
+You are a code pattern analyzer. Analyze the following Git commit to identify coding patterns and conventions:
+
+## Commit Information
+- Hash: {{.Commit.Hash}}
+- Author: {{.Commit.Author}}
+- Date: {{.Commit.Date.Format "2006-01-02 15:04:05"}}
+- Message: {{.Commit.Message}}
+
+## Code Changes
+```diff
+{{.Diff}}
+```
+
+## Known Patterns ({{len .KnownPatterns}} patterns)
+{{range .KnownPatterns}}
+- {{.Name}}: {{.Description}}
+{{end}}
+
+## Analysis Tasks
+Please analyze the commit and identify:
+1. **New Patterns**: Coding patterns not in the known patterns list
+2. **Pattern Updates**: Existing patterns that need refinement
+3. **Naming Conventions**: How files, functions, variables are named
+4. **Error Handling**: How errors are handled and propagated
+5. **Code Structure**: How code is organized and structured
+6. **Testing Patterns**: How tests are written (if applicable)
+
+## Output Format
+Return a valid JSON object (no markdown, no code blocks):
+{
+  "patterns": [
+    {
+      "id": "unique-pattern-id",
+      "name": "Pattern Name",
+      "category": "naming|error|structure|concurrency|testing",
+      "description": "What this pattern is about",
+      "good_example": "Code example following the pattern",
+      "bad_example": "Code example violating the pattern",
+      "rule": "The rule or guideline this pattern represents",
+      "confidence": 0.9,
+      "frequency": 1
+    }
+  ],
+  "updated_rules": [
+    {
+      "id": "rule-id",
+      "name": "Rule Name",
+      "pattern_ids": ["pattern-id-1", "pattern-id-2"],
+      "enabled": true
+    }
+  ]
+}
+
+**Important**:
+- Return ONLY the JSON object, no other text
+- Only include patterns with confidence >= 0.7
+- Categories must be one of: naming, error, structure, concurrency, testing
+- Pattern IDs should be lowercase with hyphens (e.g., "error-wrapping")
