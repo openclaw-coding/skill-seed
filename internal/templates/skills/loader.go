@@ -82,6 +82,21 @@ func (l *Loader) Render(name string, data interface{}) (string, error) {
 	return buf.String(), nil
 }
 
+// RenderReference 渲染 references 模板
+func (l *Loader) RenderReference(category, name string, data interface{}) (string, error) {
+	tmpl, err := l.LoadReference(category, name)
+	if err != nil {
+		return "", err
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}
+
 // Clear 清除缓存
 func (l *Loader) Clear() {
 	l.templates = make(map[string]*template.Template)

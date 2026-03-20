@@ -199,7 +199,7 @@ func (r *Repository) hardcodedDefaultConfig() *Config {
 			},
 		},
 		Output: OutputConfig{
-			SkillsPath:      "~/.claude/skills/skill-seed-skills",
+			SkillsPath:      ".claude/skills/skill-seed-skills",
 			DefaultLanguage: "go",
 		},
 	}

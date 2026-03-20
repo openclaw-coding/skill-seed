@@ -2,7 +2,6 @@ package generator
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -28,7 +27,7 @@ func NewService(
 	}
 }
 
-// GenerateSkills 生成 Skills 文件
+// GenerateSkills 生成 Skills 文件夹
 func (s *Service) GenerateSkills(ctx context.Context, outputPath string) error {
 	// 1. 获取所有模式
 	patterns, err := s.patternRepo.GetAll(ctx)
@@ -63,24 +62,24 @@ func (s *Service) GenerateSkills(ctx context.Context, outputPath string) error {
 		"TEST_NAMING_PATTERN":     stats.TestNamingPattern,
 	}
 
-	// 4. 渲染主模板
-	content, err := s.skillsLoader.Render("skill", data)
+	// 4. 确保输出目录存在
+	if err := os.MkdirAll(outputPath, 0755); err != nil {
+		return err
+	}
+
+	// 5. 生成主 SKILL.md 文件
+	mainContent, err := s.skillsLoader.Render("skill", data)
 	if err != nil {
 		return err
 	}
 
-	// 5. 确保输出目录存在
-	if err := os.MkdirAll(filepath.Dir(outputPath), 0755); err != nil {
+	mainPath := filepath.Join(outputPath, "SKILL.md")
+	if err := os.WriteFile(mainPath, []byte(mainContent), 0644); err != nil {
 		return err
 	}
 
-	// 6. 写入文件
-	if err := os.WriteFile(outputPath, []byte(content), 0644); err != nil {
-		return err
-	}
-
-	// 7. 生成 references 文件
-	if err := s.generateReferences(ctx, filepath.Dir(outputPath), stats); err != nil {
+	// 6. 生成 references 文件夹中的所有文件
+	if err := s.generateAllReferences(outputPath, data); err != nil {
 		return err
 	}
 
@@ -159,38 +158,71 @@ func (s *Service) extractPattern(patterns []domain.Pattern, category, keyword st
 	return ""
 }
 
-// generateReferences 生成 references 文件
-func (s *Service) generateReferences(ctx context.Context, outputDir string, stats *Stats) error {
-	// 为每个分类生成 reference 文件
-	categories := []string{"naming", "error", "structure", "concurrency", "testing"}
+// generateAllReferences 生成所有 references 文件
+func (s *Service) generateAllReferences(outputPath string, data map[string]interface{}) error {
+	// 定义所有需要生成的分类和文件
+	// 注意：category 名称不带 "-patterns" 后缀，LoadReference 会自动添加
+	categories := map[string][]string{
+		"naming": {
+			"overview",
+			"file-naming",
+			"variable-naming",
+			"function-naming",
+			"interface-naming",
+			"package-naming",
+		},
+		"error-handling": {
+			"overview",
+			"error-checking",
+			"error-wrapping",
+			"error-types",
+			"error-logging",
+			"error-recovery",
+		},
+		"structure": {
+			"overview",
+			"project-layout",
+			"package-organization",
+			"file-structure",
+			"layer-architecture",
+		},
+		"concurrency": {
+			"overview",
+			"goroutine-usage",
+			"channel-patterns",
+			"synchronization",
+			"context-usage",
+		},
+		"testing": {
+			"overview",
+			"test-organization",
+			"test-structure",
+			"assertions",
+			"mocking",
+		},
+	}
 
-	for _, category := range categories {
-		patterns, ok := stats.ByCategory[category]
-		if !ok || len(patterns) == 0 {
-			continue
+	// 为每个分类生成文件
+	for category, files := range categories {
+		categoryPath := filepath.Join(outputPath, "references", category+"-patterns")
+		if err := os.MkdirAll(categoryPath, 0755); err != nil {
+			return err
 		}
 
-		data := map[string]interface{}{
-			"Category":  category,
-			"Patterns":  patterns,
-			"Timestamp": time.Now(),
-		}
+		for _, file := range files {
+			// 尝试加载并渲染模板
+			content, err := s.skillsLoader.RenderReference(category, file, data)
+			if err != nil {
+				// 如果模板不存在，跳过
+				continue
+			}
 
-		// 尝试加载并渲染模板
-		content, err := s.skillsLoader.Render(fmt.Sprintf("references/%s/overview", category), data)
-		if err != nil {
-			// 如果模板不存在，跳过
-			continue
+			// 写入文件
+			outputFile := filepath.Join(categoryPath, file+".md")
+			if err := os.WriteFile(outputFile, []byte(content), 0644); err != nil {
+				return err
+			}
 		}
-
-		// 写入文件
-		refDir := filepath.Join(outputDir, "references", category)
-		if err := os.MkdirAll(refDir, 0755); err != nil {
-			continue
-		}
-
-		outputPath := filepath.Join(refDir, "overview.md")
-		_ = os.WriteFile(outputPath, []byte(content), 0644)
 	}
 
 	return nil

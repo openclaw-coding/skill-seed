@@ -17,9 +17,9 @@ This skill captures the **evolving coding standards** of this project by:
 - Detecting common anti-patterns to avoid
 - Growing smarter with each commit
 
-**Last Updated**: {{TIMESTAMP}}
-**Patterns Analyzed**: {{PATTERN_COUNT}}
-**Confidence Level**: {{AVG_CONFIDENCE}}%
+**Last Updated**: {{.TIMESTAMP}}
+**Patterns Analyzed**: {{.PATTERN_COUNT}}
+**Confidence Level**: {{.AVG_CONFIDENCE}}%
 
 ## Quick Start
 
@@ -34,13 +34,13 @@ When working on this project:
 ## Learned Patterns
 
 ### High-Confidence Patterns ⭐
-{{HIGH_CONFIDENCE_PATTERMS}}
+{{.HIGH_CONFIDENCE_PATTERMS}}
 
 ### Most Frequently Used 🔥
-{{FREQUENT_PATTERNS}}
+{{.FREQUENT_PATTERNS}}
 
 ### Recently Learned 🆕
-{{RECENT_PATTERNS}}
+{{.RECENT_PATTERNS}}
 
 ## Pattern Categories
 
@@ -110,19 +110,19 @@ Testing conventions:
 
 ### ✅ Always Follow (Auto-learned)
 
-{{ALWAYS_FOLLOW}}
+{{.ALWAYS_FOLLOW}}
 
 ### ❌ Never Do (Auto-detected)
 
-{{NEVER_DO}}
+{{.NEVER_DO}}
 
 ## Project Statistics
 
-- **Total commits analyzed**: {{TOTAL_COMMITS}}
-- **Total patterns learned**: {{TOTAL_PATTERNS}}
-- **Pattern categories**: {{PATTERN_CATEGORIES}}
-- **Average pattern confidence**: {{AVG_CONFIDENCE}}%
-- **Most active file patterns**: {{ACTIVE_FILES}}
+- **Total commits analyzed**: {{.TOTAL_COMMITS}}
+- **Total patterns learned**: {{.TOTAL_PATTERNS}}
+- **Pattern categories**: {{.PATTERN_CATEGORIES}}
+- **Average pattern confidence**: {{.AVG_CONFIDENCE}}%
+- **Most active file patterns**: {{.ACTIVE_FILES}}
 
 ## How This Skill Grows
 
@@ -243,9 +243,9 @@ Every commit contributes to this skill's knowledge:
 
 ## Resources
 
-- **Project**: {{PROJECT_NAME}}
-- **Git history**: {{GIT_REMOTE}}
-- **Last learn**: {{LAST_LEARN_TIME}}
+- **Project**: {{.PROJECT_NAME}}
+- **Git history**: {{.GIT_REMOTE}}
+- **Last learn**: {{.LAST_LEARN_TIME}}
 - **Config**: `.skills/skill-seed/config.yaml`
 
 ---
