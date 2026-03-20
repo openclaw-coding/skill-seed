@@ -2,6 +2,7 @@ package generate
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/openclaw-coding/skill-seed/cmd/skill-seed/internal/container"
 	"github.com/openclaw-coding/skill-seed/internal/i18n"
@@ -15,19 +16,26 @@ var (
 
 // Cmd 返回 generate 命令
 func Cmd(cont *container.Container) *cobra.Command {
-	// 从配置获取默认值
-	defaultOutputPath := cont.ConfigRepo.GetOutputConfig().SkillsPath
-
 	cmd := &cobra.Command{
 		Use:   "generate-skills",
 		Short: i18n.Get("GenerateShort"),
 		Long:  i18n.Get("GenerateLongDesc"),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// 检查 container 是否初始化
+			if cont == nil {
+				output.Error("%s", i18n.Get("GenerateNotInitialized"))
+				output.Dim("%s", i18n.Get("GenerateRunInitFirst")+"\n")
+				return fmt.Errorf("skill-seed not initialized")
+			}
 			return runGenerate(cont, cmd)
 		},
 	}
 
 	// 添加 flags
+	defaultOutputPath := "~/.claude/skills/skill-seed-skills"
+	if cont != nil {
+		defaultOutputPath = cont.ConfigRepo.GetOutputConfig().SkillsPath
+	}
 	cmd.Flags().StringVarP(&outputPath, "output", "o", defaultOutputPath, "Output path for generated skills")
 
 	return cmd

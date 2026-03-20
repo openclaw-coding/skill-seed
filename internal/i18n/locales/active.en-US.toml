@@ -11,7 +11,7 @@ other = "A project-level skill that learns from Git history\nto help AI agents u
 other = "Initialize skill-seed in your project.\n\nThis command will:\n  • Create .skill-seed/ directory\n  • Generate default configuration (config.yaml)\n  • Initialize BoltDB database\n  • Prepare Claude Code skills template\n\nPlease run this command in the root directory of a Git repository.\n\nExamples:\n  # Initialize in current project\n  skill-seed init\n\n  # Force re-initialization\n  skill-seed init --force"
 
 [InitStart]
-other = "Initialize Skill Seed"
+other = "Initialize skill-seed"
 
 [InitSuccess]
 other = "initialized successfully"
@@ -20,7 +20,7 @@ other = "initialized successfully"
 other = "Initialization failed: {{.Error}}"
 
 [InitSkillLocation]
-other = "Skill Seed location: {{.Path}}"
+other = "skill-seed location: {{.Path}}"
 
 [InitNextSteps]
 other = "Next steps:"
@@ -40,6 +40,12 @@ other = "  4. View generated rules: skill-seed rules"
 [LearnShort]
 other = "Learn from Git history"
 
+[LearnNotInitialized]
+other = "skill-seed not initialized"
+
+[LearnRunInitFirst]
+other = "Please run 'skill-seed init' first"
+
 [LearnLongDesc]
 other = "Learn coding patterns from Git commit history.\n\nThis command will:\n  • Analyze recent Git commits\n  • Extract coding patterns using Claude AI\n  • Save learned patterns to database\n  • Auto-generate code rules\n\nAfter learning, use 'skill-seed check' to check code quality.\n\nExamples:\n  # Learn from last 50 commits\n  skill-seed learn --limit=50\n\n  # Learn from commits in last 30 days\n  skill-seed learn --since=30d\n\n  # Force re-learn all commits\n  skill-seed learn --all --force"
 
@@ -55,11 +61,23 @@ other = "No new commits to learn"
 [CheckShort]
 other = "Check staged files"
 
+[CheckNotInitialized]
+other = "skill-seed not initialized"
+
+[CheckRunInitFirst]
+other = "Please run 'skill-seed init' first"
+
 [CheckLongDesc]
 other = "Check if staged files comply with coding standards.\n\nThis command will:\n  • Get Git staged files\n  • Analyze code using Claude AI\n  • Find issues based on learned patterns\n  • Provide fix suggestions\n\nUsually runs automatically via Git pre-commit hook.\n\nExamples:\n  # Check staged files\n  skill-seed check\n\n  # Check all files\n  skill-seed check --all"
 
 [GenerateShort]
 other = "Generate Claude Code skills"
+
+[GenerateNotInitialized]
+other = "skill-seed not initialized"
+
+[GenerateRunInitFirst]
+other = "Please run 'skill-seed init' first"
 
 [GenerateLongDesc]
 other = "Generate Claude Code skills from learned patterns.\n\nThis command will:\n  • Read learned patterns from database\n  • Generate SKILL.md file\n  • Generate README.md documentation\n  • Generate reference documentation\n\nGenerated skills can be used in Claude Code.\n\nExamples:\n  # Generate skills to default location\n  skill-seed generate-skills\n\n  # Specify output directory\n  skill-seed generate-skills --output .claude/skills\n\n  # Force overwrite existing skills\n  skill-seed generate-skills --force"
@@ -105,6 +123,12 @@ other = "View learned patterns and generated rules.\n\nSubcommands:\n  patterns 
 
 [ScanShort]
 other = "Scan and analyze project"
+
+[ScanNotInitialized]
+other = "skill-seed not initialized"
+
+[ScanRunInitFirst]
+other = "Please run 'skill-seed init' first"
 
 [ScanLongDesc]
 other = "Scan and analyze entire project.\n\nThis command will:\n  • Scan all files in project\n  • Analyze code using Claude AI\n  • Learn current codebase state\n  • Optionally generate Claude skills\n\nUseful for:\n  • After new project initialization\n  • Need comprehensive codebase analysis\n  • Generate project skills\n\nExamples:\n  # Scan project\n  skill-seed scan\n\n  # Scan and generate skills\n  skill-seed scan --generate-skills\n\n  # Scan all file types\n  skill-seed scan --all"

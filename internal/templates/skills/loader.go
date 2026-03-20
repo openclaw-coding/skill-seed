@@ -2,6 +2,7 @@ package skills
 
 import (
 	"bytes"
+	"strings"
 	"text/template"
 
 	"github.com/openclaw-coding/skill-seed/embedfs"
@@ -27,7 +28,7 @@ func (l *Loader) Load(name string) (*template.Template, error) {
 
 	// 从内嵌的文件系统加载模板
 	// 例如: templates/skills/SKILL.md.tmpl
-	path := "templates/skills/" + name + ".md.tmpl"
+	path := "templates/skills/" + strings.ToUpper(name) + ".md.tmpl"
 	data, err := embedfs.FS.ReadFile(path)
 	if err != nil {
 		return nil, err

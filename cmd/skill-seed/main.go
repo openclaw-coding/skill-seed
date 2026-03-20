@@ -45,29 +45,27 @@ func main() {
 	}
 
 	// 4. 注册命令
-	if err != nil {
-		// 如果没有找到，只能运行 init 命令
-		rootCmd.AddCommand(initcmd.Cmd())
-	} else {
-		// 创建应用容器
+	// 创建应用容器（如果 .skill-seed 存在）
+	var cont *container.Container
+	if err == nil && seedPath != "" {
 		ctx := context.Background()
-		cont, err := container.NewContainer(ctx, seedPath)
+		cont, err = container.NewContainer(ctx, seedPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
 		defer cont.Close()
-
-		// 注册子命令
-		rootCmd.AddCommand(initcmd.Cmd())
-		rootCmd.AddCommand(learn.Cmd(cont))
-		rootCmd.AddCommand(check.Cmd(cont))
-		rootCmd.AddCommand(generate.Cmd(cont))
-		rootCmd.AddCommand(hook.Cmd())
-		rootCmd.AddCommand(analyze.Cmd(cont))
-		rootCmd.AddCommand(view.Cmd(cont))
-		rootCmd.AddCommand(scan.Cmd(cont))
 	}
+
+	// 注册所有命令
+	rootCmd.AddCommand(initcmd.Cmd())
+	rootCmd.AddCommand(learn.Cmd(cont))
+	rootCmd.AddCommand(check.Cmd(cont))
+	rootCmd.AddCommand(generate.Cmd(cont))
+	rootCmd.AddCommand(hook.Cmd())
+	rootCmd.AddCommand(analyze.Cmd(cont))
+	rootCmd.AddCommand(view.Cmd(cont))
+	rootCmd.AddCommand(scan.Cmd(cont))
 
 	// 5. 执行命令
 	if err := rootCmd.Execute(); err != nil {

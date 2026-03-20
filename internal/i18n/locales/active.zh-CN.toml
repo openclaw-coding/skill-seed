@@ -11,7 +11,7 @@ other = "一个从 Git 历史中学习的项目级技能，\n帮助 AI 助手更
 other = "在当前项目中初始化 skill-seed。\n\n此命令将：\n  • 创建 .skill-seed/ 目录\n  • 生成默认配置文件 (config.yaml)\n  • 初始化 BoltDB 数据库\n  • 准备 Claude Code skills 模板\n\n请在 Git 仓库根目录运行此命令。\n\n示例：\n  # 在当前项目初始化\n  skill-seed init\n\n  # 强制重新初始化\n  skill-seed init --force"
 
 [InitStart]
-other = "初始化 Skill Seed"
+other = "初始化 skill-seed"
 
 [InitSuccess]
 other = "初始化成功"
@@ -20,7 +20,7 @@ other = "初始化成功"
 other = "初始化失败: {{.Error}}"
 
 [InitSkillLocation]
-other = "Skill Seed 位置: {{.Path}}"
+other = "skill-seed 位置: {{.Path}}"
 
 [InitNextSteps]
 other = "后续步骤:"
@@ -40,6 +40,12 @@ other = "  4. 查看生成的规则: skill-seed rules"
 [LearnShort]
 other = "从 Git 历史学习"
 
+[LearnNotInitialized]
+other = "skill-seed 未初始化"
+
+[LearnRunInitFirst]
+other = "请先运行 'skill-seed init' 初始化项目"
+
 [LearnLongDesc]
 other = "从 Git 提交历史中学习编码模式。\n\n此命令将：\n  • 分析最近的 Git 提交\n  • 使用 Claude AI 提取编码模式\n  • 保存学到的模式到数据库\n  • 自动生成代码规则\n\n学习完成后，可以使用 'skill-seed check' 来检查代码质量。\n\n示例：\n  # 学习最近 50 个提交\n  skill-seed learn --limit=50\n\n  # 学习最近 30 天的提交\n  skill-seed learn --since=30d\n\n  # 强制重新学习所有提交\n  skill-seed learn --all --force"
 
@@ -55,11 +61,23 @@ other = "没有新的提交需要学习"
 [CheckShort]
 other = "检查暂存的文件"
 
+[CheckNotInitialized]
+other = "skill-seed 未初始化"
+
+[CheckRunInitFirst]
+other = "请先运行 'skill-seed init' 初始化项目"
+
 [CheckLongDesc]
 other = "检查暂存的文件是否符合编码规范。\n\n此命令将：\n  • 获取 Git 暂存的文件\n  • 使用 Claude AI 分析代码\n  • 基于学到的模式发现问题\n  • 提供修复建议\n\n通常通过 Git pre-commit hook 自动运行。\n\n示例：\n  # 检查暂存的文件\n  skill-seed check\n\n  # 检查所有文件\n  skill-seed check --all"
 
 [GenerateShort]
 other = "生成 Claude Code skills"
+
+[GenerateNotInitialized]
+other = "skill-seed 未初始化"
+
+[GenerateRunInitFirst]
+other = "请先运行 'skill-seed init' 初始化项目"
 
 [GenerateLongDesc]
 other = "从学到的模式生成 Claude Code skills。\n\n此命令将：\n  • 从数据库读取学到的模式\n  • 生成 SKILL.md 文件\n  • 生成 README.md 文档\n  • 生成参考文档\n\n生成的 skills 可以在 Claude Code 中使用。\n\n示例：\n  # 生成 skills 到默认位置\n  skill-seed generate-skills\n\n  # 指定输出目录\n  skill-seed generate-skills --output .claude/skills\n\n  # 强制覆盖已存在的 skills\n  skill-seed generate-skills --force"
@@ -94,17 +112,35 @@ other = "Hook 已卸载"
 [AnalyzeShort]
 other = "分析指定的文件"
 
+[AnalyzeNotInitialized]
+other = "skill-seed 未初始化"
+
+[AnalyzeRunInitFirst]
+other = "请先运行 'skill-seed init' 初始化项目"
+
 [AnalyzeLongDesc]
 other = "分析指定的文件或目录。\n\n此命令将：\n  • 分析指定的文件\n  • 使用 Claude AI 检查代码\n  • 不依赖 Git 状态\n\n适用于：\n  • 在暂存前分析文件\n  • 检查其他分支的文件\n  • 快速分析无需 Git 上下文\n\n示例：\n  # 分析单个文件\n  skill-seed analyze main.go\n\n  # 分析目录\n  skill-seed analyze src/\n\n  # 分析多个文件\n  skill-seed analyze *.go"
 
 [ViewShort]
 other = "查看学习内容"
 
+[ViewNotInitialized]
+other = "skill-seed 未初始化"
+
+[ViewRunInitFirst]
+other = "请先运行 'skill-seed init' 初始化项目"
+
 [ViewLongDesc]
 other = "查看学习到的模式和生成的规则。\n\n子命令：\n  patterns  - 查看所有学到的模式\n  rules     - 查看所有生成的规则\n\n示例：\n  # 查看模式\n  skill-seed view patterns\n\n  # 查看规则\n  skill-seed view rules"
 
 [ScanShort]
 other = "扫描并分析项目"
+
+[ScanNotInitialized]
+other = "skill-seed 未初始化"
+
+[ScanRunInitFirst]
+other = "请先运行 'skill-seed init' 初始化项目"
 
 [ScanLongDesc]
 other = "扫描并分析整个项目。\n\n此命令将：\n  • 扫描项目中的所有文件\n  • 使用 Claude AI 分析代码\n  • 学习当前的代码库状态\n  • 可选生成 Claude skills\n\n适用于：\n  • 新项目初始化后\n  • 需要全面分析代码库\n  • 生成项目的 skills\n\n示例：\n  # 扫描项目\n  skill-seed scan\n\n  # 扫描并生成 skills\n  skill-seed scan --generate-skills\n\n  # 扫描所有文件类型\n  skill-seed scan --all"

@@ -18,6 +18,12 @@ func Cmd(cont *container.Container) *cobra.Command {
 		Short: i18n.Get("AnalyzeShort"),
 		Long:  i18n.Get("AnalyzeLongDesc"),
 		Run: func(cmd *cobra.Command, args []string) {
+			// 检查 container 是否初始化
+			if cont == nil {
+				fmt.Fprintln(os.Stderr, i18n.Get("AnalyzeNotInitialized"))
+				fmt.Fprintln(os.Stderr, i18n.Get("AnalyzeRunInitFirst"))
+				os.Exit(1)
+			}
 			if len(args) == 0 {
 				fmt.Fprintln(os.Stderr, i18n.Get("AnalyzeNoFiles"))
 				os.Exit(1)

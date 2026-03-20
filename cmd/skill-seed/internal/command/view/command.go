@@ -30,6 +30,12 @@ func patternsCmd(cont *container.Container) *cobra.Command {
 		Short: i18n.Get("ViewPatternsShort"),
 		Long:  i18n.Get("ViewPatternsLong"),
 		Run: func(cmd *cobra.Command, args []string) {
+			// 检查 container 是否初始化
+			if cont == nil {
+				fmt.Fprintln(os.Stderr, i18n.Get("ViewNotInitialized"))
+				fmt.Fprintln(os.Stderr, i18n.Get("ViewRunInitFirst"))
+				os.Exit(1)
+			}
 			if err := listPatterns(cont); err != nil {
 				fmt.Fprintf(os.Stderr, "%s", i18n.GetWithParams("ViewFailed", map[string]interface{}{"Error": err.Error()}))
 				os.Exit(1)
@@ -44,6 +50,12 @@ func rulesCmd(cont *container.Container) *cobra.Command {
 		Short: i18n.Get("ViewRulesShort"),
 		Long:  i18n.Get("ViewRulesLong"),
 		Run: func(cmd *cobra.Command, args []string) {
+			// 检查 container 是否初始化
+			if cont == nil {
+				fmt.Fprintln(os.Stderr, i18n.Get("ViewNotInitialized"))
+				fmt.Fprintln(os.Stderr, i18n.Get("ViewRunInitFirst"))
+				os.Exit(1)
+			}
 			if err := listRules(cont); err != nil {
 				fmt.Fprintf(os.Stderr, "%s", i18n.GetWithParams("ViewFailed", map[string]interface{}{"Error": err.Error()}))
 				os.Exit(1)

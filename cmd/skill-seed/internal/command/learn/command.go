@@ -2,6 +2,7 @@ package learn
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/openclaw-coding/skill-seed/cmd/skill-seed/internal/container"
 	"github.com/openclaw-coding/skill-seed/internal/i18n"
@@ -17,19 +18,26 @@ var (
 
 // Cmd 返回 learn 命令
 func Cmd(cont *container.Container) *cobra.Command {
-	// 从配置获取默认值
-	defaultLimit := cont.ConfigRepo.GetLearningConfig().MaxCommits
-
 	cmd := &cobra.Command{
 		Use:   "learn",
 		Short: i18n.Get("LearnShort"),
 		Long:  i18n.Get("LearnLongDesc"),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// 检查 container 是否初始化
+			if cont == nil {
+				output.Error("%s", i18n.Get("LearnNotInitialized"))
+				output.Dim("%s", i18n.Get("LearnRunInitFirst")+"\n")
+				return fmt.Errorf("skill-seed not initialized")
+			}
 			return runLearn(cont, cmd)
 		},
 	}
 
 	// 添加 flags
+	defaultLimit := 50 // 默认值
+	if cont != nil {
+		defaultLimit = cont.ConfigRepo.GetLearningConfig().MaxCommits
+	}
 	cmd.Flags().IntVarP(&limit, "limit", "l", defaultLimit, "Number of commits to analyze")
 	cmd.Flags().BoolVarP(&all, "all", "a", false, "Analyze all commits")
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Verbose output")

@@ -2,6 +2,7 @@ package learner
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/openclaw-coding/skill-seed/internal/agent"
 	"github.com/openclaw-coding/skill-seed/internal/domain"
@@ -60,7 +61,8 @@ func (s *Service) Learn(ctx context.Context, limit int) error {
 	}
 
 	// 3. 遍历每个提交进行学习
-	for _, c := range commits {
+	for i, c := range commits {
+		fmt.Printf("正在学习提交 %d/%d: %s\n", i+1, len(commits), c.Hash[:7])
 		diff, err := s.gitRepo.GetDiff(ctx, c.Hash)
 		if err != nil {
 			continue
@@ -81,6 +83,7 @@ func (s *Service) Learn(ctx context.Context, limit int) error {
 		if err != nil {
 			continue
 		}
+		fmt.Printf("  ✓ 从提交 %s 中学习了 %d 个模式\n", c.Hash[:7], len(result.Patterns))
 
 		// 4. 保存新模式
 		for _, p := range result.Patterns {

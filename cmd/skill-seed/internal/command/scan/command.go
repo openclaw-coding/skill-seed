@@ -22,6 +22,12 @@ func Cmd(cont *container.Container) *cobra.Command {
 		Short: i18n.Get("ScanShort"),
 		Long:  i18n.Get("ScanLongDesc"),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// 检查 container 是否初始化
+			if cont == nil {
+				fmt.Fprintln(os.Stderr, i18n.Get("ScanNotInitialized"))
+				fmt.Fprintln(os.Stderr, i18n.Get("ScanRunInitFirst"))
+				return fmt.Errorf("skill-seed not initialized")
+			}
 			return runScan(cont, cmd)
 		},
 	}

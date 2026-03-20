@@ -39,19 +39,23 @@ func (s *Service) GenerateSkills(ctx context.Context, outputPath string) error {
 	// 2. 计算统计信息
 	stats := s.calculateStats(patterns)
 
-	// 3. 准备模板数据
+	// 3. 准备模板数据（使用大写键名，与模板变量名对应）
 	data := map[string]interface{}{
-		"Timestamp":               time.Now(),
-		"ProjectName":             "project",
-		"PatternCount":            len(patterns),
-		"AvgConfidence":           stats.AvgConfidence,
-		"HighConfidencePatterns":  stats.HighConfidence,
-		"FrequentPatterns":        stats.Frequent,
-		"NamingPatterns":          stats.ByCategory["naming"],
-		"ErrorPatterns":           stats.ByCategory["error"],
-		"StructurePatterns":       stats.ByCategory["structure"],
-		"ConcurrencyPatterns":     stats.ByCategory["concurrency"],
-		"TestingPatterns":         stats.ByCategory["testing"],
+		"TIMESTAMP":               time.Now(),
+		"PROJECT_NAME":            "project",
+		"PATTERN_COUNT":           len(patterns),
+		"AVG_CONFIDENCE":          stats.AvgConfidence,
+		"HIGH_CONFIDENCE_PATTERMS": stats.HighConfidence,
+		"FREQUENT_PATTERNS":       stats.Frequent,
+		"RECENT_PATTERNS":         stats.HighConfidence, // 暂时用高置信度模式
+		"ALWAYS_FOLLOW":           stats.Frequent,
+		"NEVER_DO":                []domain.Pattern{},
+		"TOTAL_COMMITS":           0,
+		"TOTAL_PATTERNS":          len(patterns),
+		"PATTERN_CATEGORIES":      len(stats.ByCategory),
+		"ACTIVE_FILES":            "",
+		"GIT_REMOTE":              "",
+		"LAST_LEARN_TIME":         time.Now(),
 		"FILE_NAMING_PATTERN":     stats.FileNamingPattern,
 		"ERROR_CHECK_PATTERN":     stats.ErrorCheckPattern,
 		"DIRECTORY_STRUCTURE":     stats.DirectoryStructure,

@@ -2,6 +2,7 @@ package check
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/openclaw-coding/skill-seed/cmd/skill-seed/internal/container"
 	"github.com/openclaw-coding/skill-seed/internal/domain"
@@ -23,6 +24,12 @@ func Cmd(cont *container.Container) *cobra.Command {
 		Short: i18n.Get("CheckShort"),
 		Long:  i18n.Get("CheckLongDesc"),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// 检查 container 是否初始化
+			if cont == nil {
+				output.Error("%s", i18n.Get("CheckNotInitialized"))
+				output.Dim("%s", i18n.Get("CheckRunInitFirst")+"\n")
+				return fmt.Errorf("skill-seed not initialized")
+			}
 			return runCheck(cont, cmd)
 		},
 	}
